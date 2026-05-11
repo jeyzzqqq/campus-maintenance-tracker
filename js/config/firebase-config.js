@@ -84,6 +84,7 @@ if (typeof window !== 'undefined' && window.firebase && window.firebase.initiali
 		window.auth = window.firebase.auth();
 		window.db = window.firebase.firestore();
 		window.storage = window.firebase.storage();
+		window.auth.setPersistence(window.firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 	} catch (e) {
 		/* ignore if methods not available */
 	}

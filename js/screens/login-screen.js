@@ -72,7 +72,7 @@ const loginScreen = {
                         <p class="text-gray-500">Track and report campus issues</p>
                     </div>
 
-                    <div class="space-y-4">
+                    <form class="space-y-4" onsubmit="loginScreen.handlePrimaryAction(event)">
                         <div>
                             <label class="block text-gray-700 mb-2 font-medium">Login As</label>
                             <div class="grid grid-cols-2 gap-3 mb-4">
@@ -97,6 +97,7 @@ const loginScreen = {
 
                         <button 
                             onclick="loginScreen.handleGoogleSignIn()"
+                            type="button"
                             class="w-full bg-white text-gray-800 py-3 rounded-xl border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors font-medium flex items-center justify-center gap-3"
                         >
                             <span class="flex items-center justify-center">${loginScreen.icons.google}</span>
@@ -149,7 +150,7 @@ const loginScreen = {
 
                         <button 
                             id="primary-action-btn"
-                            onclick="loginScreen.handlePrimaryAction()"
+                            type="submit"
                             class="w-full bg-green-600 text-white py-3 rounded-xl shadow-lg hover:bg-green-700 transition-colors mt-6 font-medium"
                         >
                             <span id="login-btn-text">Sign In</span>
@@ -157,6 +158,7 @@ const loginScreen = {
 
                         <button 
                             id="toggle-create-account"
+                            type="button"
                             onclick="loginScreen.setMode(loginScreen.mode === 'signup' ? 'login' : 'signup')"
                             class="w-full text-green-600 py-2 font-medium text-sm"
                         >
@@ -164,14 +166,14 @@ const loginScreen = {
                         </button>
 
                         <div class="flex items-center justify-between gap-3">
-                            <button class="text-green-600 py-2 font-medium text-sm" onclick="loginScreen.handleForgotPassword()">
+                            <button type="button" class="text-green-600 py-2 font-medium text-sm" onclick="loginScreen.handleForgotPassword()">
                                 Forgot Password?
                             </button>
-                            <button class="text-gray-500 py-2 font-medium text-sm" onclick="loginScreen.togglePasswordVisibility()">
+                            <button type="button" class="text-gray-500 py-2 font-medium text-sm" onclick="loginScreen.togglePasswordVisibility()">
                                 Show Password
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         `;
@@ -263,7 +265,11 @@ const loginScreen = {
         buttonText.textContent = text;
     },
 
-    handlePrimaryAction: async () => {
+    handlePrimaryAction: async (event) => {
+        if (event) {
+            event.preventDefault();
+        }
+
         const email = document.getElementById('email-input').value;
         const password = document.getElementById('password-input').value;
         const confirmPasswordInput = document.getElementById('confirm-password-input');
@@ -298,7 +304,7 @@ const loginScreen = {
 
         if (result.success) {
             const userData = await authService.getUserData(result.user.uid);
-            const role = userData?.role || loginScreen.selectedRole;
+            const role = result.role || userData?.role || loginScreen.selectedRole;
             
             app.currentUser = result.user;
             app.currentRole = role;

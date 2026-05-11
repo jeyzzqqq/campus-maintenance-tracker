@@ -34,7 +34,7 @@ const authService = {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            return { success: true, user };
+            return { success: true, user, role };
         } catch (error) {
             console.error('Sign up error:', error);
             return { success: false, error: error.message };
@@ -45,7 +45,10 @@ const authService = {
     signIn: async (email, password) => {
         try {
             const userCredential = await auth.signInWithEmailAndPassword(email, password);
-            return { success: true, user: userCredential.user };
+            const user = userCredential.user;
+            const role = await authService.ensureUserProfile(user, 'user');
+
+            return { success: true, user, role };
         } catch (error) {
             console.error('Sign in error:', error);
             return { success: false, error: error.message };
