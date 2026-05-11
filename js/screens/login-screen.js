@@ -259,8 +259,12 @@ const loginScreen = {
     setLoading: (isLoading, text) => {
         const button = document.getElementById('primary-action-btn');
         const buttonText = document.getElementById('login-btn-text');
+        const googleButton = document.querySelector('button[onclick="loginScreen.handleGoogleSignIn()"]');
+        const toggleCreateButton = document.getElementById('toggle-create-account');
         if (!button || !buttonText) return;
         button.disabled = isLoading;
+        if (googleButton) googleButton.disabled = isLoading;
+        if (toggleCreateButton) toggleCreateButton.disabled = isLoading;
         button.classList.toggle('opacity-75', isLoading);
         buttonText.textContent = text;
     },
@@ -305,10 +309,15 @@ const loginScreen = {
         if (result.success) {
             const userData = await authService.getUserData(result.user.uid);
             const role = result.role || userData?.role || loginScreen.selectedRole;
+
+            document.getElementById('password-input').value = '';
+            const confirmPasswordField = document.getElementById('confirm-password-input');
+            if (confirmPasswordField) confirmPasswordField.value = '';
             
             app.currentUser = result.user;
             app.currentRole = role;
             
+            loginScreen.setMode('login');
             const screen = role === 'admin' ? 'admin-dashboard' : 'dashboard';
             app.navigate(screen);
         } else {
@@ -326,9 +335,14 @@ const loginScreen = {
             const userData = await authService.getUserData(result.user.uid);
             const role = userData?.role || result.role || 'user';
 
+            document.getElementById('password-input').value = '';
+            const confirmPasswordField = document.getElementById('confirm-password-input');
+            if (confirmPasswordField) confirmPasswordField.value = '';
+
             app.currentUser = result.user;
             app.currentRole = role;
 
+            loginScreen.setMode('login');
             app.navigate(role === 'admin' ? 'admin-dashboard' : 'dashboard');
         } else {
             loginScreen.setLoading(false, loginScreen.mode === 'signup' ? 'Create Account' : 'Sign In');
