@@ -1,6 +1,9 @@
+import { helpers } from "../utils/helpers.js";
+import { authService } from "../services/auth-service.js";
+
 // Settings Screen
 
-const settingsScreen = {
+export const settingsScreen = {
     render: () => {
         return `
             <div class="min-h-full bg-gray-50 pb-20 screen-transition">
@@ -114,4 +117,6 @@ const settingsScreen = {
     }
 };
 
-window.settingsScreen = settingsScreen;
+if (typeof window !== 'undefined') {
+    window.settingsScreen = settingsScreen;
+}

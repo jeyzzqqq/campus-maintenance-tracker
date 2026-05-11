@@ -1,6 +1,10 @@
+import { auth } from "../config/firebase-config.js";
+import { helpers } from "../utils/helpers.js";
+import { firestoreService } from "../services/firestore-service.js";
+
 // Profile Screen
 
-const profileScreen = {
+export const profileScreen = {
     render: async () => {
         helpers.showLoading();
 
@@ -71,4 +75,6 @@ const profileScreen = {
     }
 };
 
-window.profileScreen = profileScreen;
+if (typeof window !== 'undefined') {
+    window.profileScreen = profileScreen;
+}

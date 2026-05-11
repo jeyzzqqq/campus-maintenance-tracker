@@ -1,6 +1,9 @@
+import { helpers } from "../utils/helpers.js";
+import { firestoreService } from "../services/firestore-service.js";
+
 // Admin Reports Screen
 
-const adminReportsScreen = {
+export const adminReportsScreen = {
     currentFilter: 'all',
 
     render: async (filter = 'all') => {
@@ -74,4 +77,6 @@ const adminReportsScreen = {
     }
 };
 
-window.adminReportsScreen = adminReportsScreen;
+if (typeof window !== 'undefined') {
+    window.adminReportsScreen = adminReportsScreen;
+}

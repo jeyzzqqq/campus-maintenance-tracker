@@ -1,6 +1,8 @@
 // Utility Helper Functions
+import { auth, db } from "../config/firebase-config.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const helpers = {
+export const helpers = {
     icons: {
         home: `<svg viewBox="0 0 24 24" aria-hidden="true" class="h-5 w-5"><path fill="currentColor" d="M12 3.2 3 10.4V21h6.5v-6.1h5V21H21V10.4L12 3.2Zm0 2.6 7 5.6V19h-3.5v-6.1h-7V19H5V11.4l7-5.6Z"/></svg>`,
         user: `<svg viewBox="0 0 24 24" aria-hidden="true" class="h-5 w-5"><path fill="currentColor" d="M12 12.2a4.5 4.5 0 1 0-4.5-4.5 4.5 4.5 0 0 0 4.5 4.5Zm0 2.3c-4.2 0-7.8 2.6-7.8 5.8V22h15.6v-1.7c0-3.2-3.6-5.8-7.8-5.8Z"/></svg>`,
@@ -105,11 +107,10 @@ const helpers = {
 
     // Get current user role
     getCurrentUserRole: async () => {
-        const user = auth.currentUser;
-        if (!user) return null;
+        if (!auth.currentUser) return 'guest';
 
         try {
-            const userDoc = await db.collection('users').doc(user.uid).get();
+            const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
             return userDoc.exists ? userDoc.data().role : 'user';
         } catch (error) {
             console.error('Error getting user role:', error);
@@ -131,4 +132,6 @@ const helpers = {
     }
 };
 
-window.helpers = helpers;
+if (typeof window !== 'undefined') {
+    window.helpers = helpers;
+}

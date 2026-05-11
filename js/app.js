@@ -1,3 +1,15 @@
+import { authService } from "./services/auth-service.js";
+import { appNavigation } from "./components/navigation.js";
+import { loginScreen } from "./screens/login-screen.js";
+import { userDashboardScreen } from "./screens/userdashboard-screen.js";
+import { reportIssueScreen } from "./screens/report-issue-screen.js";
+import { profileScreen } from "./screens/profile-screen.js";
+import { settingsScreen } from "./screens/settings-screen.js";
+import { adminDashboardScreen } from "./screens/admin-dashboard.js";
+import { adminReportsScreen } from "./screens/admin-reports-screen.js";
+import { adminDetailScreen } from "./screens/admin-detail-screen.js";
+import { adminStatsScreen } from "./screens/admin-stats-screen.js";
+
 // Main Application Controller
 
 const app = {
@@ -87,4 +99,6 @@ if (document.readyState === 'loading') {
     app.init();
 }
 
-window.app = app;
+if (typeof window !== 'undefined') {
+    window.app = app;
+}

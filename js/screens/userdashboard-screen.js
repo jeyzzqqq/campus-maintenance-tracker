@@ -1,6 +1,10 @@
+import { auth } from "../config/firebase-config.js";
+import { helpers } from "../utils/helpers.js";
+import { firestoreService } from "../services/firestore-service.js";
+
 // User Dashboard Screen
 
-const userDashboardScreen = {
+export const userDashboardScreen = {
     render: async () => {
         helpers.showLoading();
 
@@ -55,4 +59,6 @@ const userDashboardScreen = {
     }
 };
 
-window.userDashboardScreen = userDashboardScreen;
+if (typeof window !== 'undefined') {
+    window.userDashboardScreen = userDashboardScreen;
+}

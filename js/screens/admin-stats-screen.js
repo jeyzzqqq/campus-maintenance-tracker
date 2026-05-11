@@ -1,6 +1,9 @@
+import { helpers } from "../utils/helpers.js";
+import { firestoreService } from "../services/firestore-service.js";
+
 // Admin Stats Screen
 
-const adminStatsScreen = {
+export const adminStatsScreen = {
     render: async () => {
         helpers.showLoading();
 
@@ -110,4 +113,6 @@ const adminStatsScreen = {
     }
 };
 
-window.adminStatsScreen = adminStatsScreen
+if (typeof window !== 'undefined') {
+    window.adminStatsScreen = adminStatsScreen;
+}

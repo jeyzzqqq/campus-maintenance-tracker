@@ -1,6 +1,8 @@
+import { helpers } from "../utils/helpers.js";
+
 // Navigation Component
 
-const appNavigation = {
+export const appNavigation = {
     // Render user navigation
     renderUserNav: (currentScreen) => {
         const navItems = [
@@ -56,4 +58,6 @@ const appNavigation = {
     }
 };
 
-window.appNavigation = appNavigation;
+if (typeof window !== 'undefined') {
+    window.appNavigation = appNavigation;
+}

@@ -1,6 +1,9 @@
+import { helpers } from "../utils/helpers.js";
+import { authService } from "../services/auth-service.js";
+
 // Login Screen
 
-const loginScreen = {
+export const loginScreen = {
     mode: 'login',
     selectedRole: 'user',
 
@@ -187,17 +190,21 @@ const loginScreen = {
         const createAccountToggle = document.getElementById('toggle-create-account');
 
         if (mode === 'signup') {
-            confirmWrap.classList.remove('hidden');
-            actionText.textContent = 'Create Account';
-            primaryButton.classList.remove('bg-green-600', 'hover:bg-green-700');
-            primaryButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
-            createAccountToggle.textContent = 'Already have an account? Sign In';
+            if (confirmWrap) confirmWrap.classList.remove('hidden');
+            if (actionText) actionText.textContent = 'Create Account';
+            if (primaryButton) {
+                primaryButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+                primaryButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }
+            if (createAccountToggle) createAccountToggle.textContent = 'Already have an account? Sign In';
         } else {
-            confirmWrap.classList.add('hidden');
-            actionText.textContent = 'Sign In';
-            primaryButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-            primaryButton.classList.add('bg-green-600', 'hover:bg-green-700');
-            createAccountToggle.textContent = 'Create Account';
+            if (confirmWrap) confirmWrap.classList.add('hidden');
+            if (actionText) actionText.textContent = 'Sign In';
+            if (primaryButton) {
+                primaryButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                primaryButton.classList.add('bg-green-600', 'hover:bg-green-700');
+            }
+            if (createAccountToggle) createAccountToggle.textContent = 'Create Account';
         }
     },
 
@@ -208,20 +215,21 @@ const loginScreen = {
         const emailInput = document.getElementById('email-input');
 
         if (role === 'user') {
-            userBtn.className = 'py-3 px-4 rounded-xl border-2 border-green-600 bg-green-50 text-green-700 transition-all';
-            adminBtn.className = 'py-3 px-4 rounded-xl border-2 border-gray-200 bg-white text-gray-600 transition-all';
-            emailInput.placeholder = 'student@campus.edu';
+            if (userBtn) userBtn.className = 'py-3 px-4 rounded-xl border-2 border-green-600 bg-green-50 text-green-700 transition-all';
+            if (adminBtn) adminBtn.className = 'py-3 px-4 rounded-xl border-2 border-gray-200 bg-white text-gray-600 transition-all';
+            if (emailInput) emailInput.placeholder = 'student@campus.edu';
         } else {
-            userBtn.className = 'py-3 px-4 rounded-xl border-2 border-gray-200 bg-white text-gray-600 transition-all';
-            adminBtn.className = 'py-3 px-4 rounded-xl border-2 border-green-600 bg-green-50 text-green-700 transition-all';
-            emailInput.placeholder = 'staff@campus.edu';
+            if (userBtn) userBtn.className = 'py-3 px-4 rounded-xl border-2 border-gray-200 bg-white text-gray-600 transition-all';
+            if (adminBtn) adminBtn.className = 'py-3 px-4 rounded-xl border-2 border-green-600 bg-green-50 text-green-700 transition-all';
+            if (emailInput) emailInput.placeholder = 'staff@campus.edu';
         }
     },
 
     togglePassword: () => {
         const passwordInput = document.getElementById('password-input');
         const toggleBtn = document.getElementById('toggle-password');
-        
+        if (!passwordInput || !toggleBtn) return;
+
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
             toggleBtn.innerHTML = loginScreen.icons.eyeOff;
@@ -310,7 +318,8 @@ const loginScreen = {
             const userData = await authService.getUserData(result.user.uid);
             const role = result.role || userData?.role || loginScreen.selectedRole;
 
-            document.getElementById('password-input').value = '';
+            const passwordField = document.getElementById('password-input');
+            if (passwordField) passwordField.value = '';
             const confirmPasswordField = document.getElementById('confirm-password-input');
             if (confirmPasswordField) confirmPasswordField.value = '';
             
@@ -335,7 +344,8 @@ const loginScreen = {
             const userData = await authService.getUserData(result.user.uid);
             const role = userData?.role || result.role || 'user';
 
-            document.getElementById('password-input').value = '';
+            const passwordField = document.getElementById('password-input');
+            if (passwordField) passwordField.value = '';
             const confirmPasswordField = document.getElementById('confirm-password-input');
             if (confirmPasswordField) confirmPasswordField.value = '';
 
@@ -351,4 +361,6 @@ const loginScreen = {
     }
 };
 
-window.loginScreen = loginScreen;
+if (typeof window !== 'undefined') {
+    window.loginScreen = loginScreen;
+}

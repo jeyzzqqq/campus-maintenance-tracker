@@ -1,6 +1,10 @@
+import { helpers } from "../utils/helpers.js";
+import { firestoreService } from "../services/firestore-service.js";
+import { storageService } from "../services/storage-service.js";
+
 // Report Issue Screen
 
-const reportIssueScreen = {
+export const reportIssueScreen = {
     selectedImage: null,
 
     render: () => {
@@ -167,4 +171,6 @@ const reportIssueScreen = {
     }
 };
 
-window.reportIssueScreen = reportIssueScreen;
+if (typeof window !== 'undefined') {
+    window.reportIssueScreen = reportIssueScreen;
+}

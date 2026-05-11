@@ -1,6 +1,23 @@
+import {
+	arrayUnion,
+	collection,
+	doc,
+	getDoc,
+	getDocs,
+	query,
+	orderBy,
+	where,
+	serverTimestamp,
+	setDoc,
+	updateDoc,
+	deleteDoc,
+	addDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { auth, db } from "../config/firebase-config.js";
+
 // Firestore Database Service
 
-const firestoreService = {
+export const firestoreService = {
     isUnavailableError: (error) => {
         const message = (error && error.message) ? error.message.toLowerCase() : '';
         return message.includes('permission-denied') || message.includes('firestore api has not been used') || message.includes('service disabled');
@@ -24,11 +41,11 @@ const firestoreService = {
                 userId: user.uid,
                 userEmail: user.email,
                 status: 'pending',
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
             };
 
-            const docRef = await db.collection('issues').add(issue);
+            const docRef = await addDoc(collection(db, 'issues'), issue);
             return { success: true, id: docRef.id };
         } catch (error) {
             console.error('Error creating issue:', error);
@@ -39,13 +56,11 @@ const firestoreService = {
     // Get all issues
     getAllIssues: async () => {
         try {
-            const snapshot = await db.collection('issues')
-                .orderBy('createdAt', 'desc')
-                .get();
+            const snapshot = await getDocs(query(collection(db, 'issues'), orderBy('createdAt', 'desc')));
 
             const issues = [];
-            snapshot.forEach(doc => {
-                issues.push({ id: doc.id, ...doc.data() });
+            snapshot.forEach(issueDoc => {
+                issues.push({ id: issueDoc.id, ...issueDoc.data() });
             });
 
             return { success: true, issues };
@@ -58,14 +73,11 @@ const firestoreService = {
     // Get issues by user
     getUserIssues: async (userId) => {
         try {
-            const snapshot = await db.collection('issues')
-                .where('userId', '==', userId)
-                .orderBy('createdAt', 'desc')
-                .get();
+            const snapshot = await getDocs(query(collection(db, 'issues'), where('userId', '==', userId), orderBy('createdAt', 'desc')));
 
             const issues = [];
-            snapshot.forEach(doc => {
-                issues.push({ id: doc.id, ...doc.data() });
+            snapshot.forEach(issueDoc => {
+                issues.push({ id: issueDoc.id, ...issueDoc.data() });
             });
 
             return { success: true, issues };
@@ -78,14 +90,11 @@ const firestoreService = {
     // Get issues by status
     getIssuesByStatus: async (status) => {
         try {
-            const snapshot = await db.collection('issues')
-                .where('status', '==', status)
-                .orderBy('createdAt', 'desc')
-                .get();
+            const snapshot = await getDocs(query(collection(db, 'issues'), where('status', '==', status), orderBy('createdAt', 'desc')));
 
             const issues = [];
-            snapshot.forEach(doc => {
-                issues.push({ id: doc.id, ...doc.data() });
+            snapshot.forEach(issueDoc => {
+                issues.push({ id: issueDoc.id, ...issueDoc.data() });
             });
 
             return { success: true, issues };
@@ -98,11 +107,11 @@ const firestoreService = {
     // Get single issue
     getIssue: async (issueId) => {
         try {
-            const doc = await db.collection('issues').doc(issueId).get();
-            if (!doc.exists) {
+            const issueDoc = await getDoc(doc(db, 'issues', issueId));
+            if (!issueDoc.exists()) {
                 return { success: false, error: 'Issue not found' };
             }
-            return { success: true, issue: { id: doc.id, ...doc.data() } };
+            return { success: true, issue: { id: issueDoc.id, ...issueDoc.data() } };
         } catch (error) {
             console.error('Error getting issue:', error);
             return firestoreService.handleUnavailable(error, 'This report cannot load until Firestore is enabled in Firebase Console.');
@@ -112,9 +121,9 @@ const firestoreService = {
     // Update issue
     updateIssue: async (issueId, updateData) => {
         try {
-            await db.collection('issues').doc(issueId).update({
+            await updateDoc(doc(db, 'issues', issueId), {
                 ...updateData,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                updatedAt: serverTimestamp()
             });
             return { success: true };
         } catch (error) {
@@ -126,7 +135,7 @@ const firestoreService = {
     // Delete issue
     deleteIssue: async (issueId) => {
         try {
-            await db.collection('issues').doc(issueId).delete();
+            await deleteDoc(doc(db, 'issues', issueId));
             return { success: true };
         } catch (error) {
             console.error('Error deleting issue:', error);
@@ -142,12 +151,12 @@ const firestoreService = {
                 text: noteText,
                 authorId: user.uid,
                 authorEmail: user.email,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                createdAt: serverTimestamp()
             };
 
-            await db.collection('issues').doc(issueId).update({
-                notes: firebase.firestore.FieldValue.arrayUnion(note),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            await updateDoc(doc(db, 'issues', issueId), {
+                notes: arrayUnion(note),
+                updatedAt: serverTimestamp()
             });
 
             return { success: true };
@@ -160,8 +169,8 @@ const firestoreService = {
     // Get statistics
     getStatistics: async () => {
         try {
-            const snapshot = await db.collection('issues').get();
-            
+            const snapshot = await getDocs(collection(db, 'issues'));
+
             const stats = {
                 total: 0,
                 pending: 0,
@@ -172,14 +181,14 @@ const firestoreService = {
                 low: 0
             };
 
-            snapshot.forEach(doc => {
-                const data = doc.data();
+            snapshot.forEach(issueDoc => {
+                const data = issueDoc.data();
                 stats.total++;
-                
+
                 if (data.status === 'pending') stats.pending++;
                 if (data.status === 'in-progress') stats.inProgress++;
                 if (data.status === 'resolved') stats.resolved++;
-                
+
                 if (data.priority === 'high') stats.high++;
                 if (data.priority === 'medium') stats.medium++;
                 if (data.priority === 'low') stats.low++;
@@ -193,4 +202,6 @@ const firestoreService = {
     }
 };
 
-window.firestoreService = firestoreService;
+if (typeof window !== 'undefined') {
+	window.firestoreService = firestoreService;
+}

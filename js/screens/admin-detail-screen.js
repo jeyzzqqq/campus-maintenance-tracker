@@ -1,6 +1,9 @@
+import { helpers } from "../utils/helpers.js";
+import { firestoreService } from "../services/firestore-service.js";
+
 // Admin Detail Screen
 
-const adminDetailScreen = {
+export const adminDetailScreen = {
     currentIssue: null,
 
     render: async (issueId) => {
@@ -199,4 +202,6 @@ const adminDetailScreen = {
     }
 };
 
-window.adminDetailScreen = adminDetailScreen;
+if (typeof window !== 'undefined') {
+    window.adminDetailScreen = adminDetailScreen;
+}

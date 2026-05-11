@@ -1,6 +1,9 @@
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { auth, storage } from "../config/firebase-config.js";
+
 // Firebase Storage Service
 
-const storageService = {
+export const storageService = {
     // Upload image
     uploadImage: async (file, path = 'issues') => {
         try {
@@ -9,13 +12,10 @@ const storageService = {
 
             const timestamp = Date.now();
             const fileName = `${path}/${user.uid}_${timestamp}_${file.name}`;
-            const storageRef = storage.ref(fileName);
+            const storageRef = ref(storage, fileName);
 
-            // Upload file
-            const snapshot = await storageRef.put(file);
-            
-            // Get download URL
-            const downloadURL = await snapshot.ref.getDownloadURL();
+            await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(storageRef);
 
             return { success: true, url: downloadURL };
         } catch (error) {
@@ -27,8 +27,8 @@ const storageService = {
     // Delete image
     deleteImage: async (imageUrl) => {
         try {
-            const imageRef = storage.refFromURL(imageUrl);
-            await imageRef.delete();
+            const imageRef = ref(storage, imageUrl);
+            await deleteObject(imageRef);
             return { success: true };
         } catch (error) {
             console.error('Error deleting image:', error);
@@ -37,4 +37,6 @@ const storageService = {
     }
 };
 
-window.storageService = storageService;
+if (typeof window !== 'undefined') {
+	window.storageService = storageService;
+}
