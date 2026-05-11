@@ -73,23 +73,6 @@ const loginScreen = {
                     </div>
 
                     <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-3">
-                            <button 
-                                id="mode-login"
-                                onclick="loginScreen.setMode('login')"
-                                class="py-3 rounded-xl border text-sm font-medium transition-colors bg-green-600 text-white border-green-600"
-                            >
-                                Sign In
-                            </button>
-                            <button 
-                                id="mode-signup"
-                                onclick="loginScreen.setMode('signup')"
-                                class="py-3 rounded-xl border text-sm font-medium transition-colors bg-white text-gray-600 border-gray-200"
-                            >
-                                Create Account
-                            </button>
-                        </div>
-
                         <div>
                             <label class="block text-gray-700 mb-2 font-medium">Login As</label>
                             <div class="grid grid-cols-2 gap-3 mb-4">
@@ -172,6 +155,14 @@ const loginScreen = {
                             <span id="login-btn-text">Sign In</span>
                         </button>
 
+                        <button 
+                            id="toggle-create-account"
+                            onclick="loginScreen.setMode(loginScreen.mode === 'signup' ? 'login' : 'signup')"
+                            class="w-full text-green-600 py-2 font-medium text-sm"
+                        >
+                            Create Account
+                        </button>
+
                         <div class="flex items-center justify-between gap-3">
                             <button class="text-green-600 py-2 font-medium text-sm" onclick="loginScreen.handleForgotPassword()">
                                 Forgot Password?
@@ -188,26 +179,23 @@ const loginScreen = {
 
     setMode: (mode) => {
         loginScreen.mode = mode;
-        const loginBtn = document.getElementById('mode-login');
-        const signupBtn = document.getElementById('mode-signup');
         const confirmWrap = document.getElementById('confirm-password-wrap');
         const actionText = document.getElementById('login-btn-text');
         const primaryButton = document.getElementById('primary-action-btn');
+        const createAccountToggle = document.getElementById('toggle-create-account');
 
         if (mode === 'signup') {
-            loginBtn.className = 'py-3 rounded-xl border text-sm font-medium transition-colors bg-white text-gray-600 border-gray-200';
-            signupBtn.className = 'py-3 rounded-xl border text-sm font-medium transition-colors bg-green-600 text-white border-green-600';
             confirmWrap.classList.remove('hidden');
             actionText.textContent = 'Create Account';
             primaryButton.classList.remove('bg-green-600', 'hover:bg-green-700');
             primaryButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            createAccountToggle.textContent = 'Already have an account? Sign In';
         } else {
-            loginBtn.className = 'py-3 rounded-xl border text-sm font-medium transition-colors bg-green-600 text-white border-green-600';
-            signupBtn.className = 'py-3 rounded-xl border text-sm font-medium transition-colors bg-white text-gray-600 border-gray-200';
             confirmWrap.classList.add('hidden');
             actionText.textContent = 'Sign In';
             primaryButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
             primaryButton.classList.add('bg-green-600', 'hover:bg-green-700');
+            createAccountToggle.textContent = 'Create Account';
         }
     },
 
