@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Maintenance Tracker</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-50 font-inter">
+    <!-- Mobile Frame Container -->
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div id="mobile-frame" class="w-full max-w-[375px] h-[812px] bg-white rounded-[3rem] shadow-2xl overflow-hidden relative border-8 border-gray-900">
+
+            <!-- Status Bar -->
+            <div class="bg-white px-6 py-3 flex justify-between items-center">
+                <span class="text-sm font-medium">9:41</span>
+                <div class="flex gap-1">
+                    <div class="w-4 h-3 border border-gray-900 rounded-sm"></div>
+                    <div class="w-4 h-3 border border-gray-900 rounded-sm"></div>
+                    <div class="w-4 h-3 border border-gray-900 rounded-sm bg-gray-900"></div>
+                </div>
+            </div>
+
+            <!-- Screen Container -->
+            <div id="screen-container" class="h-[calc(100%-60px)] overflow-y-auto">
+                <!-- Screens will be dynamically loaded here -->
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div id="bottom-nav" class="hidden absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3">
+                <!-- Navigation will be dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/config/firebase-config.js?v=20260512a"></script>
+    <script src="js/utils/helpers.js?v=20260512a"></script>
+    <script src="js/services/auth-service.js?v=20260512a"></script>
+    <script src="js/services/firestore-service.js?v=20260512a"></script>
+    <script src="js/services/storage-service.js?v=20260512a"></script>
+    <script src="js/components/navigation.js?v=20260512a"></script>
+    <script src="js/screens/login-screen.js?v=20260512a"></script>
+    <script src="js/screens/userdashboard-screen.js?v=20260512a"></script>
+    <script src="js/screens/report-issue-screen.js?v=20260512a"></script>
+    <script src="js/screens/profile-screen.js?v=20260512a"></script>
+    <script src="js/screens/settings-screen.js?v=20260512a"></script>
+    <script src="js/screens/admin-dashboard.js?v=20260512a"></script>
+    <script src="js/screens/admin-reports-screen.js?v=20260512a"></script>
+    <script src="js/screens/admin-detail-screen.js?v=20260512a"></script>
+    <script src="js/screens/admin-stats-screen.js?v=20260512a"></script>
+    <script src="js/app.js?v=20260512a"></script>
+</body>
+</html>

@@ -20,7 +20,7 @@
 //   measurementId: "G-XXXXXXX" // optional
 // };
 
-export const firebaseConfig = {
+const firebaseConfig = {
 	// Firebase config provided by the user
 	apiKey: "AIzaSyBCEE-avgr-Ax1sUPP0OJ59247_juwq3hk",
 	authDomain: "maintenance-tracker-4fdae.firebaseapp.com",
@@ -59,7 +59,7 @@ export const firebaseConfig = {
 // }
 
 // Helper: small runtime check for a compat-style global firebase.
-export function initCompatFirebaseIfPresent() {
+function initCompatFirebaseIfPresent() {
 	if (typeof window === 'undefined') return null;
 	const fb = window.firebase;
 	if (!fb || !fb.initializeApp) return null;
@@ -87,5 +87,10 @@ if (typeof window !== 'undefined' && window.firebase && window.firebase.initiali
 	} catch (e) {
 		/* ignore if methods not available */
 	}
+}
+
+if (typeof window !== 'undefined') {
+	window.firebaseConfig = firebaseConfig;
+	window.initCompatFirebaseIfPresent = initCompatFirebaseIfPresent;
 }
 
