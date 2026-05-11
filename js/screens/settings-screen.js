@@ -47,15 +47,15 @@ const settingsScreen = {
                         <div class="divide-y divide-gray-100">
                             <button class="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
                                 <span class="text-gray-900 text-sm">Edit Profile</span>
-                                <span class="text-2xl">›</span>
+                                <span class="text-gray-400">${helpers.icons.arrowRight}</span>
                             </button>
                             <button class="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
                                 <span class="text-gray-900 text-sm">Change Password</span>
-                                <span class="text-2xl">›</span>
+                                <span class="text-gray-400">${helpers.icons.arrowRight}</span>
                             </button>
                             <button class="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
                                 <span class="text-gray-900 text-sm">Privacy Settings</span>
-                                <span class="text-2xl">›</span>
+                                <span class="text-gray-400">${helpers.icons.arrowRight}</span>
                             </button>
                         </div>
                     </div>
@@ -65,11 +65,11 @@ const settingsScreen = {
                         <div class="divide-y divide-gray-100">
                             <button class="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
                                 <span class="text-gray-900 text-sm">Terms of Service</span>
-                                <span class="text-2xl">›</span>
+                                <span class="text-gray-400">${helpers.icons.arrowRight}</span>
                             </button>
                             <button class="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
                                 <span class="text-gray-900 text-sm">Privacy Policy</span>
-                                <span class="text-2xl">›</span>
+                                <span class="text-gray-400">${helpers.icons.arrowRight}</span>
                             </button>
                             <div class="px-4 py-3">
                                 <p class="text-gray-500 text-xs">Version 1.0.0</p>
@@ -81,7 +81,7 @@ const settingsScreen = {
                         onclick="settingsScreen.handleSignOut()"
                         class="w-full bg-red-50 text-red-600 py-3 rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2 font-medium"
                     >
-                        <span class="text-xl">🚪</span>
+                        <span class="w-5 h-5">${helpers.icons.signOut}</span>
                         Sign Out
                     </button>
                 </div>

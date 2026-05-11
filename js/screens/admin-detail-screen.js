@@ -11,7 +11,7 @@ const adminDetailScreen = {
             return `
                 <div class="h-full flex items-center justify-center p-6">
                     <div class="text-center">
-                        <span class="text-6xl block mb-4">❌</span>
+                        <span class="text-red-500 block mb-4 mx-auto w-16 h-16">${helpers.icons.error}</span>
                         <h3 class="text-gray-900 font-semibold mb-2">Error</h3>
                         <p class="text-gray-500 text-sm">${result.error}</p>
                         <button 
@@ -47,12 +47,12 @@ const adminDetailScreen = {
                             <img src="${issue.imageUrl}" class="w-full h-48 object-cover rounded-xl mb-4" />
                         ` : `
                             <div class="w-full h-48 bg-gray-100 rounded-xl flex items-center justify-center text-6xl mb-4">
-                                ${issue.icon || '🔧'}
+                                ${helpers.issueIcon(issue.icon)}
                             </div>
                         `}
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">${issue.title}</h3>
                         <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                            <span>📍</span>
+                            <span class="text-gray-400 w-4 h-4 inline-flex items-center justify-center">${helpers.icons.location}</span>
                             <span>${issue.location}</span>
                         </div>
                         <div class="flex items-center gap-2 mb-3">
@@ -120,7 +120,7 @@ const adminDetailScreen = {
                                 onclick="adminDetailScreen.addNote()"
                                 class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
                             >
-                                <span class="text-xl">💬</span>
+                                <span class="w-5 h-5 inline-flex items-center justify-center">${helpers.icons.note}</span>
                             </button>
                         </div>
                     </div>

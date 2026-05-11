@@ -39,7 +39,7 @@ const adminReportsScreen = {
                 <div class="p-4 space-y-3 mt-4">
                     ${issues.length === 0 ? `
                         <div class="bg-white rounded-2xl shadow-sm p-8 text-center">
-                            <span class="text-6xl block mb-4">📋</span>
+                            <span class="text-gray-400 block mb-4 mx-auto w-16 h-16">${helpers.icons.reports}</span>
                             <h3 class="text-gray-900 font-semibold mb-2">No Reports</h3>
                             <p class="text-gray-500 text-sm">No ${filter === 'all' ? '' : filter} reports found</p>
                         </div>
@@ -50,12 +50,12 @@ const adminReportsScreen = {
                         >
                             <div class="flex gap-4">
                                 <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center text-3xl flex-shrink-0">
-                                    ${issue.icon || '🔧'}
+                                    ${helpers.issueIcon(issue.icon)}
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <h4 class="text-gray-900 font-medium mb-1 truncate">${issue.title}</h4>
                                     <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                                        <span>📍</span>
+                                        <span class="text-gray-400 w-4 h-4 inline-flex items-center justify-center">${helpers.icons.location}</span>
                                         <span class="truncate">${issue.location}</span>
                                     </div>
                                     <div class="flex items-center gap-2 mb-2">
@@ -64,7 +64,7 @@ const adminReportsScreen = {
                                     </div>
                                     <p class="text-xs text-gray-400">Reported by: ${issue.userEmail}</p>
                                 </div>
-                                <span class="text-2xl text-gray-400 flex-shrink-0 self-center">›</span>
+                                <span class="text-gray-400 flex-shrink-0 self-center">${helpers.icons.arrowRight}</span>
                             </div>
                         </div>
                     `).join('')}

@@ -20,7 +20,7 @@ const reportIssueScreen = {
                         >
                             <div id="image-preview-container">
                                 <div class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-3 flex items-center justify-center">
-                                    <span class="text-4xl">📷</span>
+                                    <span class="text-gray-400">${helpers.icons.photo}</span>
                                 </div>
                                 <p class="text-gray-600 mb-1">Tap to upload photo</p>
                                 <p class="text-sm text-gray-400">or take a new one</p>
@@ -70,7 +70,7 @@ const reportIssueScreen = {
                     <div>
                         <label class="block text-gray-700 mb-3 font-medium">Location</label>
                         <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xl">📍</span>
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">${helpers.icons.location}</span>
                             <input 
                                 id="location-input"
                                 type="text" 
@@ -78,7 +78,7 @@ const reportIssueScreen = {
                                 class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
                             />
                         </div>
-                        <p class="text-sm text-gray-500 mt-2">📍 Location auto-detected</p>
+                        <p class="text-sm text-gray-500 mt-2 flex items-center gap-1">${helpers.icons.location}<span>Location auto-detected</span></p>
                     </div>
 
                     <button 
@@ -111,7 +111,7 @@ const reportIssueScreen = {
             const previewContainer = document.getElementById('image-preview-container');
             previewContainer.innerHTML = `
                 <img src="${e.target.result}" class="image-preview mx-auto mb-3" />
-                <p class="text-green-600 text-sm">✓ Image selected</p>
+                <p class="text-green-600 text-sm flex items-center justify-center gap-1"><span class="w-4 h-4">${helpers.icons.check}</span><span>Image selected</span></p>
             `;
         };
         reader.readAsDataURL(file);
@@ -149,7 +149,7 @@ const reportIssueScreen = {
             priority,
             location,
             imageUrl,
-            icon: '🔧',
+            icon: 'wrench',
             notes: []
         };
 

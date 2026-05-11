@@ -17,7 +17,7 @@ const profileScreen = {
                 <div class="bg-green-600 text-white p-6 rounded-b-3xl shadow-md">
                     <div class="flex flex-col items-center">
                         <div class="w-24 h-24 bg-white rounded-full mb-4 flex items-center justify-center text-5xl">
-                            👤
+                            <span class="text-green-600">${helpers.icons.user}</span>
                         </div>
                         <h2 class="text-xl font-semibold text-white mb-1">${user.email.split('@')[0]}</h2>
                         <p class="text-green-100 text-sm">${user.email}</p>
@@ -48,19 +48,19 @@ const profileScreen = {
                             <div class="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between">
                                 <div class="flex items-center gap-3">
                                     <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-xl">
-                                        ${issue.icon || '🔧'}
+                                        ${helpers.issueIcon(issue.icon)}
                                     </div>
                                     <div>
                                         <p class="text-gray-900 text-sm font-medium mb-1">${issue.title}</p>
                                         ${helpers.getStatusBadge(issue.status)}
                                     </div>
                                 </div>
-                                <span class="text-2xl">›</span>
+                                <span class="text-gray-400">${helpers.icons.arrowRight}</span>
                             </div>
                         `).join('')}
                         ${issues.length === 0 ? `
                             <div class="bg-white rounded-xl shadow-sm p-8 text-center">
-                                <span class="text-4xl block mb-2">📝</span>
+                                <span class="text-gray-400 block mb-2 mx-auto w-10 h-10">${helpers.icons.clipboard}</span>
                                 <p class="text-gray-500 text-sm">No reports yet</p>
                             </div>
                         ` : ''}
