@@ -1,6 +1,18 @@
 // Firestore Database Service
 
 const firestoreService = {
+    isUnavailableError: (error) => {
+        const message = (error && error.message) ? error.message.toLowerCase() : '';
+        return message.includes('permission-denied') || message.includes('firestore api has not been used') || message.includes('service disabled');
+    },
+
+    handleUnavailable: (error, fallbackMessage) => {
+        if (firestoreService.isUnavailableError(error)) {
+            return { success: false, error: fallbackMessage || 'Firestore is not available yet. Enable the Firestore API in Firebase Console.' };
+        }
+        return { success: false, error: error.message };
+    },
+
     // Create new issue report
     createIssue: async (issueData) => {
         try {
@@ -20,7 +32,7 @@ const firestoreService = {
             return { success: true, id: docRef.id };
         } catch (error) {
             console.error('Error creating issue:', error);
-            return { success: false, error: error.message };
+            return firestoreService.handleUnavailable(error, 'Unable to save the report right now. Firestore needs to be enabled in Firebase Console.');
         }
     },
 
@@ -39,7 +51,7 @@ const firestoreService = {
             return { success: true, issues };
         } catch (error) {
             console.error('Error getting issues:', error);
-            return { success: false, error: error.message, issues: [] };
+            return { ...firestoreService.handleUnavailable(error, 'Reports cannot load until Firestore is enabled in Firebase Console.'), issues: [] };
         }
     },
 
@@ -59,7 +71,7 @@ const firestoreService = {
             return { success: true, issues };
         } catch (error) {
             console.error('Error getting user issues:', error);
-            return { success: false, error: error.message, issues: [] };
+            return { ...firestoreService.handleUnavailable(error, 'Your reports cannot load until Firestore is enabled in Firebase Console.'), issues: [] };
         }
     },
 
@@ -79,7 +91,7 @@ const firestoreService = {
             return { success: true, issues };
         } catch (error) {
             console.error('Error getting issues by status:', error);
-            return { success: false, error: error.message, issues: [] };
+            return { ...firestoreService.handleUnavailable(error, 'Reports cannot load until Firestore is enabled in Firebase Console.'), issues: [] };
         }
     },
 
@@ -93,7 +105,7 @@ const firestoreService = {
             return { success: true, issue: { id: doc.id, ...doc.data() } };
         } catch (error) {
             console.error('Error getting issue:', error);
-            return { success: false, error: error.message };
+            return firestoreService.handleUnavailable(error, 'This report cannot load until Firestore is enabled in Firebase Console.');
         }
     },
 
@@ -107,7 +119,7 @@ const firestoreService = {
             return { success: true };
         } catch (error) {
             console.error('Error updating issue:', error);
-            return { success: false, error: error.message };
+            return firestoreService.handleUnavailable(error, 'Unable to update the report until Firestore is enabled in Firebase Console.');
         }
     },
 
@@ -118,7 +130,7 @@ const firestoreService = {
             return { success: true };
         } catch (error) {
             console.error('Error deleting issue:', error);
-            return { success: false, error: error.message };
+            return firestoreService.handleUnavailable(error, 'Unable to delete the report until Firestore is enabled in Firebase Console.');
         }
     },
 
@@ -141,7 +153,7 @@ const firestoreService = {
             return { success: true };
         } catch (error) {
             console.error('Error adding note:', error);
-            return { success: false, error: error.message };
+            return firestoreService.handleUnavailable(error, 'Unable to add notes until Firestore is enabled in Firebase Console.');
         }
     },
 
@@ -176,7 +188,7 @@ const firestoreService = {
             return { success: true, stats };
         } catch (error) {
             console.error('Error getting statistics:', error);
-            return { success: false, error: error.message };
+            return firestoreService.handleUnavailable(error, 'Statistics cannot load until Firestore is enabled in Firebase Console.');
         }
     }
 };
