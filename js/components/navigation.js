@@ -14,9 +14,9 @@ export const appNavigation = {
         return navItems.map(item => `
             <button 
                 onclick="app.navigate('${item.id}')" 
-                class="flex flex-col items-center gap-1 ${currentScreen === item.id ? 'text-green-600' : 'text-gray-400'}"
+                class="flex flex-1 flex-col items-center justify-center gap-0.5 py-1 text-[11px] leading-none ${currentScreen === item.id ? 'text-green-600 font-medium' : 'text-gray-400'}"
             >
-                <span class="text-gray-500 ${currentScreen === item.id ? 'text-green-600' : 'text-gray-400'}">${item.icon}</span>
+                <span class="flex h-5 w-5 items-center justify-center ${currentScreen === item.id ? 'text-green-600' : 'text-gray-400'}">${item.icon}</span>
                 <span class="text-xs">${item.label}</span>
             </button>
         `).join('');
@@ -34,9 +34,9 @@ export const appNavigation = {
         return navItems.map(item => `
             <button 
                 onclick="app.navigate('${item.id}')" 
-                class="flex flex-col items-center gap-1 ${currentScreen === item.id ? 'text-green-600' : 'text-gray-400'}"
+                class="flex flex-1 flex-col items-center justify-center gap-0.5 py-1 text-[11px] leading-none ${currentScreen === item.id ? 'text-green-600 font-medium' : 'text-gray-400'}"
             >
-                <span class="text-gray-500 ${currentScreen === item.id ? 'text-green-600' : 'text-gray-400'}">${item.icon}</span>
+                <span class="flex h-5 w-5 items-center justify-center ${currentScreen === item.id ? 'text-green-600' : 'text-gray-400'}">${item.icon}</span>
                 <span class="text-xs">${item.label}</span>
             </button>
         `).join('');

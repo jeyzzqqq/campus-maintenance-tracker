@@ -19,21 +19,61 @@ import { auth, db } from "../config/firebase-config.js";
 
 export const authService = {
     ensureUserProfile: async (user, role = 'user') => {
-        const userRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userRef);
+        try {
+            const userRef = doc(db, 'users', user.uid);
+            const userDoc = await getDoc(userRef);
 
-        if (!userDoc.exists()) {
-            await setDoc(userRef, {
-                email: user.email || '',
-                displayName: user.displayName || '',
-                role: role,
-                authProvider: user.providerData?.[0]?.providerId || 'password',
-                createdAt: serverTimestamp()
-            });
-            return role;
+            if (!userDoc.exists()) {
+                console.log(`Creating new user profile for ${user.uid} with role: ${role}`);
+                try {
+                    await setDoc(userRef, {
+                        email: user.email || '',
+                        displayName: user.displayName || '',
+                        role: role,
+                        authProvider: user.providerData?.[0]?.providerId || 'password',
+                        createdAt: serverTimestamp()
+                    });
+                } catch (writeError) {
+                    console.error('Error creating user profile in Firestore:', writeError);
+                    // Return the role we're trying to set, but log the error
+                }
+                return role;
+            }
+
+            const userRole = userDoc.data()?.role || role;
+            console.log(`Retrieved user profile for ${user.uid}: role=${userRole}`);
+            return userRole;
+        } catch (error) {
+            console.error('Error in ensureUserProfile:', error);
+            // If Firestore is not accessible, we can't verify the role
+            // This is a critical issue - we should return an error
+            throw new Error(`Cannot verify user role: ${error.message}`);
         }
+    },
 
-        return userDoc.data()?.role || role;
+    verifyRoleAccess: async (user, expectedRole = 'user') => {
+        try {
+            const actualRole = await authService.ensureUserProfile(user, expectedRole);
+
+            console.log(`Role verification: user=${user.uid}, expected=${expectedRole}, actual=${actualRole}`);
+
+            if (actualRole !== expectedRole) {
+                console.warn(`Role mismatch detected! Expected ${expectedRole} but found ${actualRole}`);
+                await signOut(auth);
+                return {
+                    success: false,
+                    error: `This account is registered as ${actualRole}. Please switch to the ${actualRole} login.`
+                };
+            }
+
+            return { success: true, role: actualRole };
+        } catch (error) {
+            console.error('Error in verifyRoleAccess:', error);
+            return {
+                success: false,
+                error: 'Role verification failed. Please try again.'
+            };
+        }
     },
 
     // Sign up new user
@@ -58,11 +98,19 @@ export const authService = {
     },
 
     // Sign in existing user
-    signIn: async (email, password) => {
+    signIn: async (email, password, expectedRole = 'user') => {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-            const role = await authService.ensureUserProfile(user, 'user');
+
+            const accessCheck = await authService.verifyRoleAccess(user, expectedRole);
+            if (!accessCheck.success) {
+                console.warn('Role verification failed on sign-in:', accessCheck.error);
+                return accessCheck;
+            }
+
+            const role = accessCheck.role;
+            console.log(`User ${email} signed in successfully with role: ${role}`);
 
             return { success: true, user, role };
         } catch (error) {
@@ -72,14 +120,22 @@ export const authService = {
     },
 
     // Sign in with Google
-    signInWithGoogle: async () => {
+    signInWithGoogle: async (expectedRole = 'user') => {
         try {
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
 
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
-            const role = await authService.ensureUserProfile(user, 'user');
+
+            const accessCheck = await authService.verifyRoleAccess(user, expectedRole);
+            if (!accessCheck.success) {
+                console.warn('Role verification failed on Google sign-in:', accessCheck.error);
+                return accessCheck;
+            }
+
+            const role = accessCheck.role;
+            console.log(`User ${user.email} signed in with Google successfully, role: ${role}`);
 
             return { success: true, user, role };
         } catch (error) {

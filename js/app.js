@@ -43,6 +43,21 @@ const app = {
         app.currentScreen = screen;
         app.screenParams = params;
 
+        const adminScreens = ['admin-dashboard', 'admin-reports', 'admin-detail', 'admin-stats'];
+        const activeUser = app.currentUser || authService.getCurrentUser();
+
+        if (screen !== 'login' && !activeUser) {
+            screen = 'login';
+            app.currentScreen = screen;
+            app.screenParams = null;
+        }
+
+        if (adminScreens.includes(screen) && app.currentRole !== 'admin') {
+            screen = 'dashboard';
+            app.currentScreen = screen;
+            app.screenParams = null;
+        }
+
         const container = document.getElementById('screen-container');
         
         // Hide navigation for login and report screens

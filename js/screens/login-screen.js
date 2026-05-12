@@ -76,8 +76,10 @@ export const loginScreen = {
                     </div>
 
                     <form class="space-y-4" onsubmit="loginScreen.handlePrimaryAction(event)">
+                        <div id="login-validation-message" class="hidden rounded-xl border px-4 py-3 text-sm" aria-live="polite"></div>
+
                         <div>
-                            <label class="block text-gray-700 mb-2 font-medium">Login As</label>
+                            <label class="block text-gray-700 mb-2 font-medium">Choose your access</label>
                             <div class="grid grid-cols-2 gap-3 mb-4">
                                 <button 
                                     id="role-user"
@@ -85,7 +87,8 @@ export const loginScreen = {
                                     class="py-3 px-4 rounded-xl border-2 border-green-600 bg-green-50 text-green-700 transition-all"
                                 >
                                     <span class="block mb-1 text-green-700 flex justify-center">${loginScreen.icons.user}</span>
-                                    <span class="text-sm">Student</span>
+                                    <span class="block text-sm font-medium leading-tight">Student</span>
+                                    <span class="block text-[11px] text-green-600/80 leading-tight">Student access</span>
                                 </button>
                                 <button 
                                     id="role-admin"
@@ -93,7 +96,8 @@ export const loginScreen = {
                                     class="py-3 px-4 rounded-xl border-2 border-gray-200 bg-white text-gray-600 transition-all"
                                 >
                                     <span class="block mb-1 text-gray-600 flex justify-center">${loginScreen.icons.staff}</span>
-                                    <span class="text-sm">Staff</span>
+                                    <span class="block text-sm font-medium leading-tight">Staff</span>
+                                    <span class="block text-[11px] text-gray-500 leading-tight">Staff access</span>
                                 </button>
                             </div>
                         </div>
@@ -243,6 +247,52 @@ export const loginScreen = {
         loginScreen.togglePassword();
     },
 
+    setFieldState: (field, isInvalid) => {
+        if (!field) return;
+
+        field.classList.toggle('border-red-500', isInvalid);
+        field.classList.toggle('ring-2', isInvalid);
+        field.classList.toggle('ring-red-200', isInvalid);
+        field.classList.toggle('focus:ring-red-500', isInvalid);
+
+        if (isInvalid) {
+            field.setAttribute('aria-invalid', 'true');
+        } else {
+            field.removeAttribute('aria-invalid');
+        }
+    },
+
+    clearValidation: () => {
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
+        const confirmPasswordInput = document.getElementById('confirm-password-input');
+
+        loginScreen.setFieldState(emailInput, false);
+        loginScreen.setFieldState(passwordInput, false);
+        loginScreen.setFieldState(confirmPasswordInput, false);
+    },
+
+    clearLoginMessage: () => {
+        const messageBox = document.getElementById('login-validation-message');
+        if (!messageBox) return;
+
+        messageBox.className = 'hidden rounded-xl border px-4 py-3 text-sm';
+        messageBox.textContent = '';
+    },
+
+    showLoginMessage: (message, type = 'error') => {
+        const messageBox = document.getElementById('login-validation-message');
+        if (!messageBox) {
+            helpers.showError(message);
+            return;
+        }
+
+        messageBox.textContent = message;
+        messageBox.className = `rounded-xl border px-4 py-3 text-sm ${type === 'error'
+            ? 'border-red-200 bg-red-50 text-red-700'
+            : 'border-green-200 bg-green-50 text-green-700'}`;
+    },
+
     handleForgotPassword: async () => {
         const email = document.getElementById('email-input').value.trim();
 
@@ -282,28 +332,52 @@ export const loginScreen = {
             event.preventDefault();
         }
 
+        loginScreen.clearValidation();
+        loginScreen.clearLoginMessage();
+
         const email = document.getElementById('email-input').value;
         const password = document.getElementById('password-input').value;
         const confirmPasswordInput = document.getElementById('confirm-password-input');
 
         if (!email || !password) {
-            helpers.showError('Please fill in all fields');
+            const emailInput = document.getElementById('email-input');
+            const passwordInput = document.getElementById('password-input');
+
+            const missingFields = [];
+            if (!email) {
+                missingFields.push('email');
+                loginScreen.setFieldState(emailInput, true);
+            }
+            if (!password) {
+                missingFields.push('password');
+                loginScreen.setFieldState(passwordInput, true);
+            }
+
+            loginScreen.showLoginMessage(`Please enter your ${missingFields.join(' and ')} first`);
+            (missingFields.includes('email') ? emailInput : passwordInput)?.focus();
             return;
         }
 
         if (!helpers.validateEmail(email)) {
-            helpers.showError('Please enter a valid email');
+            const emailInput = document.getElementById('email-input');
+            loginScreen.setFieldState(emailInput, true);
+            loginScreen.showLoginMessage('Please enter a valid email address');
+            emailInput?.focus();
             return;
         }
 
         if (loginScreen.mode === 'signup') {
             const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
             if (!confirmPassword) {
-                helpers.showError('Please confirm your password');
+                loginScreen.setFieldState(confirmPasswordInput, true);
+                loginScreen.showLoginMessage('Please confirm your password');
+                confirmPasswordInput?.focus();
                 return;
             }
             if (password !== confirmPassword) {
-                helpers.showError('Passwords do not match');
+                loginScreen.setFieldState(confirmPasswordInput, true);
+                loginScreen.showLoginMessage('Passwords do not match');
+                confirmPasswordInput?.focus();
                 return;
             }
         }
@@ -312,7 +386,7 @@ export const loginScreen = {
 
         const result = loginScreen.mode === 'signup'
             ? await authService.signUp(email, password, loginScreen.selectedRole)
-            : await authService.signIn(email, password);
+            : await authService.signIn(email, password, loginScreen.selectedRole);
 
         if (result.success) {
             const userData = await authService.getUserData(result.user.uid);
@@ -327,18 +401,31 @@ export const loginScreen = {
             app.currentRole = role;
             
             loginScreen.setMode('login');
+            loginScreen.clearLoginMessage();
+            
+            // Show confirmation popup for staff/admin users
+            if (role === 'admin') {
+                loginScreen.setLoading(false, loginScreen.mode === 'signup' ? 'Create Account' : 'Sign In');
+                const confirmed = confirm('Are you sure you are continuing to the staff/admin portal?');
+                if (!confirmed) {
+                    return;
+                }
+            }
+            
             const screen = role === 'admin' ? 'admin-dashboard' : 'dashboard';
             app.navigate(screen);
         } else {
             loginScreen.setLoading(false, loginScreen.mode === 'signup' ? 'Create Account' : 'Sign In');
-            helpers.showError(result.error || 'Login failed');
+            loginScreen.showLoginMessage(result.error || 'Login failed');
         }
     },
 
     handleGoogleSignIn: async () => {
+        loginScreen.clearValidation();
+        loginScreen.clearLoginMessage();
         loginScreen.setLoading(true, 'Signing in with Google...');
 
-        const result = await authService.signInWithGoogle();
+        const result = await authService.signInWithGoogle(loginScreen.selectedRole);
 
         if (result.success) {
             const userData = await authService.getUserData(result.user.uid);
@@ -353,10 +440,21 @@ export const loginScreen = {
             app.currentRole = role;
 
             loginScreen.setMode('login');
+            loginScreen.clearLoginMessage();
+            
+            // Show confirmation popup for staff/admin users
+            if (role === 'admin') {
+                loginScreen.setLoading(false, loginScreen.mode === 'signup' ? 'Create Account' : 'Sign In');
+                const confirmed = confirm('Are you sure you are continuing to the staff/admin portal?');
+                if (!confirmed) {
+                    return;
+                }
+            }
+            
             app.navigate(role === 'admin' ? 'admin-dashboard' : 'dashboard');
         } else {
             loginScreen.setLoading(false, loginScreen.mode === 'signup' ? 'Create Account' : 'Sign In');
-            helpers.showError(result.error || 'Google sign-in failed');
+            loginScreen.showLoginMessage(result.error || 'Google sign-in failed');
         }
     }
 };

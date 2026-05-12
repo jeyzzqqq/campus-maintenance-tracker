@@ -17,12 +17,12 @@
 <body class="min-h-screen bg-gray-50 font-inter">
     <!-- App Shell -->
     <div class="relative min-h-screen">
-        <div id="screen-container" class="min-h-screen overflow-y-auto pb-24">
+        <div id="screen-container" class="min-h-screen overflow-y-auto pb-32">
             <!-- Screens will be dynamically loaded here -->
         </div>
 
         <!-- Bottom Navigation -->
-        <div id="bottom-nav" class="hidden absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 shadow-lg">
+        <div id="bottom-nav" class="hidden fixed inset-x-0 bottom-0 z-50 bg-white border-t border-gray-200 px-6 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shadow-[0_-8px_24px_rgba(15,23,42,0.08)]">
             <!-- Navigation will be dynamically loaded -->
         </div>
     </div>

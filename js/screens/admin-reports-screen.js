@@ -18,7 +18,7 @@ export const adminReportsScreen = {
         }
 
         return `
-            <div class="min-h-full bg-gray-50 pb-20 screen-transition">
+            <div class="min-h-full bg-gray-50 pb-32 screen-transition">
                 <div class="bg-green-600 text-white p-6 rounded-b-3xl shadow-md">
                     <h2 class="text-xl font-semibold text-white mb-4">All Reports</h2>
 

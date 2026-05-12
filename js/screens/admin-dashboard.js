@@ -17,52 +17,52 @@ export const adminDashboardScreen = {
         const highPriorityIssues = issues.filter(i => i.priority === 'high' && i.status !== 'resolved');
 
         return `
-            <div class="min-h-full bg-gray-50 pb-20 screen-transition">
-                <div class="bg-green-600 text-white p-6 rounded-b-3xl shadow-md">
-                    <h2 class="text-xl font-semibold text-white mb-1">Maintenance Dashboard</h2>
-                    <p class="text-green-100 text-sm">Monitor and manage all reports</p>
+            <div class="min-h-full bg-gray-50 pb-32 screen-transition">
+                <div class="bg-green-600 text-white px-5 pt-6 pb-5 rounded-b-[2rem] shadow-md">
+                    <h2 class="text-[1.05rem] font-semibold text-white mb-1">Maintenance Dashboard</h2>
+                    <p class="text-green-100 text-[0.82rem] leading-tight">Monitor and manage all reports</p>
                 </div>
 
-                <div class="p-4 space-y-4 mt-4">
+                <div class="px-4 pt-4 space-y-4">
                     <!-- Stats Cards -->
-                    <div class="grid grid-cols-3 gap-3">
-                        <div class="bg-white rounded-xl shadow-sm p-4 text-center">
-                            <div class="w-10 h-10 bg-amber-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <div class="grid grid-cols-3 gap-2.5">
+                        <div class="bg-white rounded-2xl shadow-sm p-3 text-center">
+                            <div class="w-9 h-9 bg-amber-100 rounded-xl mx-auto mb-2 flex items-center justify-center">
                                 <span class="text-amber-700">${helpers.icons.clock}</span>
                             </div>
-                            <p class="text-2xl font-semibold text-gray-900 mb-1">${pending}</p>
-                            <p class="text-xs text-gray-500">Pending</p>
+                            <p class="text-[1.35rem] font-semibold text-gray-900 leading-none mb-1">${pending}</p>
+                            <p class="text-[0.72rem] text-gray-500">Pending</p>
                         </div>
-                        <div class="bg-white rounded-xl shadow-sm p-4 text-center">
-                            <div class="w-10 h-10 bg-blue-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                        <div class="bg-white rounded-2xl shadow-sm p-3 text-center">
+                            <div class="w-9 h-9 bg-blue-100 rounded-xl mx-auto mb-2 flex items-center justify-center">
                                 <span class="text-blue-700">${helpers.icons.settings}</span>
                             </div>
-                            <p class="text-2xl font-semibold text-gray-900 mb-1">${inProgress}</p>
-                            <p class="text-xs text-gray-500">In Progress</p>
+                            <p class="text-[1.35rem] font-semibold text-gray-900 leading-none mb-1">${inProgress}</p>
+                            <p class="text-[0.72rem] text-gray-500">In Progress</p>
                         </div>
-                        <div class="bg-white rounded-xl shadow-sm p-4 text-center">
-                            <div class="w-10 h-10 bg-green-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                        <div class="bg-white rounded-2xl shadow-sm p-3 text-center">
+                            <div class="w-9 h-9 bg-green-100 rounded-xl mx-auto mb-2 flex items-center justify-center">
                                 <span class="text-green-700">${helpers.icons.check}</span>
                             </div>
-                            <p class="text-2xl font-semibold text-gray-900 mb-1">${resolved}</p>
-                            <p class="text-xs text-gray-500">Resolved</p>
+                            <p class="text-[1.35rem] font-semibold text-gray-900 leading-none mb-1">${resolved}</p>
+                            <p class="text-[0.72rem] text-gray-500">Resolved</p>
                         </div>
                     </div>
 
                     <!-- Quick Actions -->
                     <div class="bg-white rounded-2xl shadow-sm p-4">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Quick Actions</h3>
+                        <h3 class="text-base font-semibold text-gray-900 mb-3">Quick Actions</h3>
                         <div class="grid grid-cols-2 gap-3">
                             <button 
                                 onclick="app.navigate('admin-reports')"
-                                class="bg-green-50 text-green-700 py-3 px-4 rounded-xl hover:bg-green-100 transition-colors flex items-center justify-center gap-2 font-medium"
+                                class="bg-green-50 text-green-700 py-3 px-3 rounded-2xl hover:bg-green-100 transition-colors flex items-center justify-center gap-2 font-medium"
                             >
                                 <span class="text-green-700">${helpers.icons.reports}</span>
                                 <span class="text-sm">All Reports</span>
                             </button>
                             <button 
                                 onclick="app.navigate('admin-stats')"
-                                class="bg-blue-50 text-blue-700 py-3 px-4 rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 font-medium"
+                                class="bg-blue-50 text-blue-700 py-3 px-3 rounded-2xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 font-medium"
                             >
                                 <span class="text-blue-700">${helpers.icons.stats}</span>
                                 <span class="text-sm">Statistics</span>
@@ -72,7 +72,7 @@ export const adminDashboardScreen = {
 
                     <!-- High Priority Issues -->
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">High Priority Issues</h3>
+                        <h3 class="text-base font-semibold text-gray-900 mb-3">High Priority Issues</h3>
                         <div class="space-y-3">
                             ${highPriorityIssues.length === 0 ? `
                                 <div class="bg-white rounded-2xl shadow-sm p-8 text-center">

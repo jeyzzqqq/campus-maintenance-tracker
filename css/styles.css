@@ -73,3 +73,21 @@ body {
     object-fit: cover;
     border-radius: 12px;
 }
+
+#bottom-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem;
+    backdrop-filter: blur(14px);
+}
+
+#bottom-nav button {
+    min-width: 0;
+    flex: 1 1 0;
+    border-radius: 0.75rem;
+}
+
+#bottom-nav button span:last-child {
+    margin-top: 0.15rem;
+}
