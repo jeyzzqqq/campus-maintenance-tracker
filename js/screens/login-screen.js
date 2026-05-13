@@ -1,5 +1,6 @@
 import { helpers } from "../utils/helpers.js";
 import { authService } from "../services/auth-service.js";
+import { auth } from "../config/firebase-config.js";
 
 // Login Screen
 
@@ -79,7 +80,6 @@ export const loginScreen = {
                         <div id="login-validation-message" class="hidden rounded-xl border px-4 py-3 text-sm" aria-live="polite"></div>
 
                         <div>
-                            <label class="block text-gray-700 mb-2 font-medium">Choose your access</label>
                             <div class="grid grid-cols-2 gap-3 mb-4">
                                 <button 
                                     id="role-user"
@@ -214,6 +214,7 @@ export const loginScreen = {
 
     selectRole: (role) => {
         loginScreen.selectedRole = role;
+        console.log(`[selectRole] Changed to: ${role}`);
         const userBtn = document.getElementById('role-user');
         const adminBtn = document.getElementById('role-admin');
         const emailInput = document.getElementById('email-input');
@@ -287,7 +288,12 @@ export const loginScreen = {
             return;
         }
 
-        messageBox.textContent = message;
+        // Convert markdown-style formatting to HTML for better display
+        let displayMessage = message
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/❌/g, '⚠️');
+
+        messageBox.innerHTML = `<div>${displayMessage.replace(/\n/g, '<br>')}</div>`;
         messageBox.className = `rounded-xl border px-4 py-3 text-sm ${type === 'error'
             ? 'border-red-200 bg-red-50 text-red-700'
             : 'border-green-200 bg-green-50 text-green-700'}`;
@@ -382,15 +388,22 @@ export const loginScreen = {
             }
         }
 
+        // Set flag to prevent onAuthStateChanged auto-navigation during login
+        app.isLoginInProgress = true;
         loginScreen.setLoading(true, loginScreen.mode === 'signup' ? 'Creating account...' : 'Signing in...');
 
         const result = loginScreen.mode === 'signup'
             ? await authService.signUp(email, password, loginScreen.selectedRole)
             : await authService.signIn(email, password, loginScreen.selectedRole);
 
+        // Clear flag after login attempt
+        app.isLoginInProgress = false;
+
         if (result.success) {
             const userData = await authService.getUserData(result.user.uid);
             const role = result.role || userData?.role || loginScreen.selectedRole;
+
+            console.log(`[Login Success] Email: ${result.user.email}, result.role: ${result.role}, userData.role: ${userData?.role}, selectedRole: ${loginScreen.selectedRole}, finalRole: ${role}`);
 
             const passwordField = document.getElementById('password-input');
             if (passwordField) passwordField.value = '';
@@ -403,16 +416,21 @@ export const loginScreen = {
             loginScreen.setMode('login');
             loginScreen.clearLoginMessage();
             
-            // Show confirmation popup for staff/admin users
+            // Show confirmation popup for staff/admin users only
             if (role === 'admin') {
                 loginScreen.setLoading(false, loginScreen.mode === 'signup' ? 'Create Account' : 'Sign In');
-                const confirmed = confirm('Are you sure you are continuing to the staff/admin portal?');
+                const confirmed = confirm('✅ You are signing in as a Staff/Admin user.\n\nContinue to Staff Dashboard?');
                 if (!confirmed) {
+                    await authService.signOut();
+                    loginScreen.setLoading(false, loginScreen.mode === 'signup' ? 'Create Account' : 'Sign In');
                     return;
                 }
+            } else {
+                loginScreen.setLoading(false, loginScreen.mode === 'signup' ? 'Create Account' : 'Sign In');
             }
             
             const screen = role === 'admin' ? 'admin-dashboard' : 'dashboard';
+            console.log(`[Navigation] Going to screen: ${screen} (role: ${role})`);
             app.navigate(screen);
         } else {
             loginScreen.setLoading(false, loginScreen.mode === 'signup' ? 'Create Account' : 'Sign In');
@@ -423,9 +441,15 @@ export const loginScreen = {
     handleGoogleSignIn: async () => {
         loginScreen.clearValidation();
         loginScreen.clearLoginMessage();
+
+        // Set flag to prevent onAuthStateChanged auto-navigation during login
+        app.isLoginInProgress = true;
         loginScreen.setLoading(true, 'Signing in with Google...');
 
         const result = await authService.signInWithGoogle(loginScreen.selectedRole);
+
+        // Clear flag after login attempt
+        app.isLoginInProgress = false;
 
         if (result.success) {
             const userData = await authService.getUserData(result.user.uid);
@@ -444,16 +468,20 @@ export const loginScreen = {
             
             // Show confirmation popup for staff/admin users
             if (role === 'admin') {
-                loginScreen.setLoading(false, loginScreen.mode === 'signup' ? 'Create Account' : 'Sign In');
-                const confirmed = confirm('Are you sure you are continuing to the staff/admin portal?');
+                loginScreen.setLoading(false, 'Signing in with Google...');
+                const confirmed = confirm('✅ You are signing in as a Staff/Admin user.\n\nContinue to Staff Dashboard?');
                 if (!confirmed) {
+                    await authService.signOut();
+                    loginScreen.setLoading(false, 'Signing in with Google...');
                     return;
                 }
+            } else {
+                loginScreen.setLoading(false, 'Signing in with Google...');
             }
             
             app.navigate(role === 'admin' ? 'admin-dashboard' : 'dashboard');
         } else {
-            loginScreen.setLoading(false, loginScreen.mode === 'signup' ? 'Create Account' : 'Sign In');
+            loginScreen.setLoading(false, 'Signing in with Google...');
             loginScreen.showLoginMessage(result.error || 'Google sign-in failed');
         }
     }

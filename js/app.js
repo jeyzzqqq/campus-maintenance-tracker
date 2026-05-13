@@ -17,10 +17,17 @@ const app = {
     currentUser: null,
     currentRole: null,
     screenParams: null,
+    isLoginInProgress: false, // Flag to prevent auto-navigation during login
 
     init: () => {
         // Check if user is already logged in
         authService.onAuthStateChanged(async (user) => {
+            // Skip auto-navigation if a login is in progress
+            if (app.isLoginInProgress) {
+                console.log('Login in progress, skipping auto-navigation');
+                return;
+            }
+
             if (user && !app.currentUser) {
                 app.currentUser = user;
                 const userData = await authService.getUserData(user.uid);
@@ -44,6 +51,7 @@ const app = {
         app.screenParams = params;
 
         const adminScreens = ['admin-dashboard', 'admin-reports', 'admin-detail', 'admin-stats'];
+        const userScreens = ['dashboard', 'report', 'profile'];
         const activeUser = app.currentUser || authService.getCurrentUser();
 
         if (screen !== 'login' && !activeUser) {
@@ -52,6 +60,14 @@ const app = {
             app.screenParams = null;
         }
 
+        // Prevent admins from accessing user screens
+        if (userScreens.includes(screen) && app.currentRole === 'admin') {
+            screen = 'admin-dashboard';
+            app.currentScreen = screen;
+            app.screenParams = null;
+        }
+
+        // Prevent users from accessing admin screens
         if (adminScreens.includes(screen) && app.currentRole !== 'admin') {
             screen = 'dashboard';
             app.currentScreen = screen;
@@ -60,8 +76,8 @@ const app = {
 
         const container = document.getElementById('screen-container');
         
-        // Hide navigation for login and report screens
-        const hideNavScreens = ['login', 'report', 'admin-detail'];
+        // Hide navigation for login and admin-detail screens only
+        const hideNavScreens = ['login', 'admin-detail'];
         if (hideNavScreens.includes(screen)) {
             appNavigation.hide();
         } else {

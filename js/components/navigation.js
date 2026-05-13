@@ -7,6 +7,7 @@ export const appNavigation = {
     renderUserNav: (currentScreen) => {
         const navItems = [
             { id: 'dashboard', icon: helpers.icons.home, label: 'Home' },
+            { id: 'report', icon: `<svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M9 2H7a2 2 0 00-2 2v16a2 2 0 002 2h10a2 2 0 002-2V4a2 2 0 00-2-2h-2m0 0V1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1m0 0h3v3H9V2z"/></svg>`, label: 'Report' },
             { id: 'profile', icon: helpers.icons.user, label: 'Profile' },
             { id: 'settings', icon: helpers.icons.settings, label: 'Settings' }
         ];

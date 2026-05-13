@@ -11,23 +11,33 @@ export const reportIssueScreen = {
         const location = helpers.detectLocation();
 
         return `
-            <div class="min-h-full bg-gray-50 p-6 pb-20 screen-transition">
-                <h2 class="text-2xl font-semibold text-gray-900 mb-6">Report New Issue</h2>
+            <div class="min-h-full bg-gray-50 pb-32 screen-transition">
+                <!-- Header -->
+                <div class="bg-gray-50 sticky top-0 z-10 border-b border-gray-200">
+                    <div class="px-6 py-6">
+                        <h1 class="text-2xl font-bold text-gray-900">Report New Issue</h1>
+                    </div>
+                </div>
 
-                <div class="space-y-6">
+                <!-- Form Content -->
+                <div class="px-6 py-6 space-y-6">
+                    <!-- Photo Upload Section -->
                     <div>
-                        <label class="block text-gray-700 mb-3 font-medium">Photo</label>
+                        <label class="block text-base font-medium text-gray-900 mb-3">Photo</label>
                         <div 
                             id="image-upload-area"
                             onclick="document.getElementById('image-input').click()"
-                            class="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-green-500 transition-colors cursor-pointer"
+                            class="border-2 border-dashed border-gray-300 bg-white rounded-2xl px-6 py-8 text-center hover:border-green-600 transition-colors cursor-pointer"
                         >
                             <div id="image-preview-container">
-                                <div class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-3 flex items-center justify-center">
-                                    <span class="text-gray-400">${helpers.icons.photo}</span>
+                                <div class="w-16 h-16 bg-gray-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
                                 </div>
-                                <p class="text-gray-600 mb-1">Tap to upload photo</p>
-                                <p class="text-sm text-gray-400">or take a new one</p>
+                                <p class="text-gray-700 font-medium mb-1">Tap to upload photo</p>
+                                <p class="text-sm text-gray-500">or take a new one</p>
                             </div>
                         </div>
                         <input 
@@ -39,31 +49,35 @@ export const reportIssueScreen = {
                         />
                     </div>
 
+                    <!-- Title Input -->
                     <div>
-                        <label class="block text-gray-700 mb-3 font-medium">Title</label>
+                        <label class="block text-base font-medium text-gray-900 mb-3">Title</label>
                         <input 
                             id="title-input"
                             type="text" 
                             placeholder="Brief description of the issue"
-                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
                         />
                     </div>
 
+                    <!-- Description Textarea -->
                     <div>
-                        <label class="block text-gray-700 mb-3 font-medium">Description</label>
+                        <label class="block text-base font-medium text-gray-900 mb-3">Description</label>
                         <textarea 
                             id="description-input"
                             placeholder="Describe the issue in detail..."
                             rows="4"
-                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                            class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all resize-none"
                         ></textarea>
                     </div>
 
+                    <!-- Priority Dropdown -->
                     <div>
-                        <label class="block text-gray-700 mb-3 font-medium">Priority</label>
+                        <label class="block text-base font-medium text-gray-900 mb-3">Priority</label>
                         <select 
                             id="priority-select"
-                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                            class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all appearance-none cursor-pointer"
+                            style="background-image: url('data:image/svg+xml;utf8,<svg fill=\"%23666\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\"/></svg>'); background-repeat: no-repeat; background-position: right 8px center; background-size: 24px; padding-right: 36px;"
                         >
                             <option value="low">Low</option>
                             <option value="medium" selected>Medium</option>
@@ -71,31 +85,41 @@ export const reportIssueScreen = {
                         </select>
                     </div>
 
+                    <!-- Location Input -->
                     <div>
-                        <label class="block text-gray-700 mb-3 font-medium">Location</label>
+                        <label class="block text-base font-medium text-gray-900 mb-3">Location</label>
                         <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">${helpers.icons.location}</span>
+                            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
                             <input 
                                 id="location-input"
                                 type="text" 
                                 value="${location}"
-                                class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                                class="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
                             />
                         </div>
-                        <p class="text-sm text-gray-500 mt-2 flex items-center gap-1">${helpers.icons.location}<span>Location auto-detected</span></p>
+                        <p class="text-sm text-gray-600 mt-2 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span>Location auto-detected</span>
+                        </p>
                     </div>
 
+                    <!-- Submit Button -->
                     <button 
                         id="submit-btn"
                         onclick="reportIssueScreen.handleSubmit()"
-                        class="w-full bg-green-600 text-white py-3 rounded-xl shadow-lg hover:bg-green-700 transition-colors font-medium"
+                        class="w-full bg-green-600 text-white py-3 rounded-xl shadow-md hover:bg-green-700 active:scale-98 transition-all font-medium text-base"
                     >
                         Submit Report
                     </button>
 
+                    <!-- Cancel Button -->
                     <button 
                         onclick="app.navigate('dashboard')"
-                        class="w-full text-gray-600 py-2 font-medium"
+                        class="w-full text-gray-700 py-2 font-medium text-base hover:text-gray-900 transition-colors"
                     >
                         Cancel
                     </button>
