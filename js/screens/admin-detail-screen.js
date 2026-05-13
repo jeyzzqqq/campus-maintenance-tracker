@@ -5,6 +5,7 @@ import { firestoreService } from "../services/firestore-service.js";
 
 export const adminDetailScreen = {
     currentIssue: null,
+    isImageZoomOpen: false,
 
     render: async (issueId) => {
         helpers.showLoading();
@@ -47,7 +48,14 @@ export const adminDetailScreen = {
                     <!-- Image & Details -->
                     <div class="bg-white rounded-2xl shadow-sm p-6">
                         ${issue.imageUrl ? `
-                            <img src="${issue.imageUrl}" class="w-full h-48 object-cover rounded-xl mb-4" />
+                            <button
+                                type="button"
+                                onclick="adminDetailScreen.openImageZoom()"
+                                class="block w-full mb-4 overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                                aria-label="Zoom report image"
+                            >
+                                <img src="${issue.imageUrl}" class="w-full h-48 object-cover transition-transform duration-200 hover:scale-105" alt="Report image" />
+                            </button>
                         ` : `
                             <div class="w-full h-48 bg-gray-100 rounded-xl flex items-center justify-center text-6xl mb-4">
                                 ${helpers.issueIcon(issue.icon)}
@@ -56,7 +64,7 @@ export const adminDetailScreen = {
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">${issue.title}</h3>
                         <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
                             <span class="text-gray-400 w-4 h-4 inline-flex items-center justify-center">${helpers.icons.location}</span>
-                            <span>${issue.location}</span>
+                            <span>${issue.location || '(Location not specified)'}</span>
                         </div>
                         <div class="flex items-center gap-2 mb-3">
                             ${helpers.getStatusBadge(issue.status)}
@@ -71,6 +79,26 @@ export const adminDetailScreen = {
                             ` : ''}
                         </div>
                     </div>
+
+                    ${issue.imageUrl ? `
+                        <div 
+                            id="image-zoom-overlay"
+                            class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4"
+                            onclick="adminDetailScreen.closeImageZoom()"
+                        >
+                            <div class="relative max-w-5xl w-full max-h-full" onclick="event.stopPropagation()">
+                                <button
+                                    type="button"
+                                    onclick="adminDetailScreen.closeImageZoom()"
+                                    class="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-white text-gray-900 shadow-lg flex items-center justify-center text-xl"
+                                    aria-label="Close image zoom"
+                                >
+                                    ×
+                                </button>
+                                <img src="${issue.imageUrl}" alt="Zoomed report image" class="w-full max-h-[85vh] object-contain rounded-xl shadow-2xl bg-black" />
+                            </div>
+                        </div>
+                    ` : ''}
 
                     <!-- Update Status -->
                     <div class="bg-white rounded-2xl shadow-sm p-4">
@@ -145,6 +173,24 @@ export const adminDetailScreen = {
                 </div>
             </div>
         `;
+    },
+
+    openImageZoom: () => {
+        adminDetailScreen.isImageZoomOpen = true;
+        const overlay = document.getElementById('image-zoom-overlay');
+        if (overlay) {
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+        }
+    },
+
+    closeImageZoom: () => {
+        adminDetailScreen.isImageZoomOpen = false;
+        const overlay = document.getElementById('image-zoom-overlay');
+        if (overlay) {
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+        }
     },
 
     updateStatus: async (newStatus) => {

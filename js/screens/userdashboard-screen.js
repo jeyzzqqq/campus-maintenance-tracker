@@ -27,16 +27,23 @@ export const userDashboardScreen = {
                             <p class="text-gray-500 text-sm">Tap the + button to report an issue</p>
                         </div>
                     ` : issues.map(issue => `
-                        <div class="bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-shadow">
+                        <div 
+                            onclick="app.navigate('user-report', '${issue.id}')"
+                            class="bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer"
+                        >
                             <div class="flex gap-4">
                                 <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center text-3xl flex-shrink-0">
-                                    ${helpers.issueIcon(issue.icon)}
+                                    ${issue.imageUrl ? `
+                                        <img src="${issue.imageUrl}" class="w-full h-full object-cover rounded-xl" />
+                                    ` : `
+                                        ${helpers.issueIcon(issue.icon)}
+                                    `}
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <h3 class="text-gray-900 font-medium mb-1 truncate">${issue.title}</h3>
                                     <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
                                         <span class="text-gray-400 w-4 h-4 inline-flex items-center justify-center">${helpers.icons.location}</span>
-                                        <span class="truncate">${issue.location}</span>
+                                        <span class="truncate">${issue.location || '(Location not specified)'}</span>
                                     </div>
                                     <div class="flex items-center justify-between">
                                         ${helpers.getStatusBadge(issue.status)}

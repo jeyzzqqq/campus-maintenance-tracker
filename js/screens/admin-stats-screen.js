@@ -99,14 +99,6 @@ export const adminStatsScreen = {
                         </div>
                     </div>
 
-                    <!-- Response Time -->
-                    <div class="bg-white rounded-2xl shadow-sm p-4">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Average Response Time</h3>
-                        <div class="text-center">
-                            <p class="text-4xl font-bold text-green-600 mb-2">2.5</p>
-                            <p class="text-sm text-gray-500">days</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         `;

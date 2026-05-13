@@ -3,6 +3,7 @@ import { appNavigation } from "./components/navigation.js";
 import { loginScreen } from "./screens/login-screen.js";
 import { userDashboardScreen } from "./screens/userdashboard-screen.js";
 import { reportIssueScreen } from "./screens/report-issue-screen.js";
+import { userReportDetailScreen } from "./screens/user-report-detail-screen.js";
 import { profileScreen } from "./screens/profile-screen.js";
 import { settingsScreen } from "./screens/settings-screen.js";
 import { adminDashboardScreen } from "./screens/admin-dashboard.js";
@@ -51,7 +52,7 @@ const app = {
         app.screenParams = params;
 
         const adminScreens = ['admin-dashboard', 'admin-reports', 'admin-detail', 'admin-stats'];
-        const userScreens = ['dashboard', 'report', 'profile'];
+        const userScreens = ['dashboard', 'report', 'profile', 'user-report'];
         const activeUser = app.currentUser || authService.getCurrentUser();
 
         if (screen !== 'login' && !activeUser) {
@@ -76,8 +77,8 @@ const app = {
 
         const container = document.getElementById('screen-container');
         
-        // Hide navigation for login and admin-detail screens only
-        const hideNavScreens = ['login', 'admin-detail'];
+        // Hide navigation for login and detail screens
+        const hideNavScreens = ['login', 'admin-detail', 'user-report'];
         if (hideNavScreens.includes(screen)) {
             appNavigation.hide();
         } else {
@@ -99,6 +100,9 @@ const app = {
                 break;
             case 'profile':
                 html = await profileScreen.render();
+                break;
+            case 'user-report':
+                html = await userReportDetailScreen.render(params);
                 break;
             case 'settings':
                 html = settingsScreen.render();

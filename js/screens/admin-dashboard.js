@@ -85,14 +85,21 @@ export const adminDashboardScreen = {
                                     class="bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer"
                                 >
                                     <div class="flex gap-4">
-                                        <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center text-3xl flex-shrink-0">
-                                            ${helpers.issueIcon(issue.icon)}
+                                        <div class="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center text-3xl flex-shrink-0">
+                                            ${issue.imageUrl ? `
+                                                <img src="${issue.imageUrl}" alt="Report image" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                                <div class="w-full h-full hidden items-center justify-center">
+                                                    ${helpers.issueIcon(issue.icon)}
+                                                </div>
+                                            ` : `
+                                                ${helpers.issueIcon(issue.icon)}
+                                            `}
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <h4 class="text-gray-900 font-medium mb-1 truncate">${issue.title}</h4>
                                             <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
                                                 <span class="text-gray-400 w-4 h-4 inline-flex items-center justify-center">${helpers.icons.location}</span>
-                                                <span class="truncate">${issue.location}</span>
+                                                <span class="truncate">${issue.location || '(Location not specified)'}</span>
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 ${helpers.getStatusBadge(issue.status)}

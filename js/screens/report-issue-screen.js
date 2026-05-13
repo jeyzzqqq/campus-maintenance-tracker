@@ -8,8 +8,6 @@ export const reportIssueScreen = {
     selectedImage: null,
 
     render: () => {
-        const location = helpers.detectLocation();
-
         return `
             <div class="min-h-full bg-gray-50 pb-32 screen-transition">
                 <!-- Header -->
@@ -85,6 +83,24 @@ export const reportIssueScreen = {
                         </select>
                     </div>
 
+                    <!-- Floor Selection -->
+                    <div>
+                        <label class="block text-base font-medium text-gray-900 mb-3">Floor</label>
+                        <select 
+                            id="floor-select"
+                            class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all appearance-none cursor-pointer"
+                            style="background-image: url('data:image/svg+xml;utf8,<svg fill=\"%23666\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\"/></svg>'); background-repeat: no-repeat; background-position: right 8px center; background-size: 24px; padding-right: 36px;"
+                        >
+                            <option value="">Select a floor...</option>
+                            <option value="1st Floor">1st Floor</option>
+                            <option value="2nd Floor">2nd Floor</option>
+                            <option value="3rd Floor">3rd Floor</option>
+                            <option value="4th Floor">4th Floor</option>
+                            <option value="5th Floor">5th Floor</option>
+                            <option value="6th Floor">6th Floor</option>
+                        </select>
+                    </div>
+
                     <!-- Location Input -->
                     <div>
                         <label class="block text-base font-medium text-gray-900 mb-3">Location</label>
@@ -95,16 +111,11 @@ export const reportIssueScreen = {
                             <input 
                                 id="location-input"
                                 type="text" 
-                                value="${location}"
+                                placeholder="e.g., Room 101, CR, Admin Office"
                                 class="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
                             />
                         </div>
-                        <p class="text-sm text-gray-600 mt-2 flex items-center gap-2">
-                            <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                            </svg>
-                            <span>Location auto-detected</span>
-                        </p>
+                        <p class="text-sm text-gray-600 mt-2">Specify the room number or location details</p>
                     </div>
 
                     <!-- Submit Button -->
@@ -149,46 +160,71 @@ export const reportIssueScreen = {
         const title = document.getElementById('title-input').value;
         const description = document.getElementById('description-input').value;
         const priority = document.getElementById('priority-select').value;
-        const location = document.getElementById('location-input').value;
+        const floor = document.getElementById('floor-select').value;
+        const locationDetails = document.getElementById('location-input').value;
         const submitBtn = document.getElementById('submit-btn');
 
-        if (!title || !description || !location) {
+        if (!title || !description || !floor || !locationDetails) {
             helpers.showError('Please fill in all required fields');
             return;
         }
 
+        // Combine floor and location details
+        const location = `${floor} - ${locationDetails}`;
+
         submitBtn.textContent = 'Submitting...';
         submitBtn.disabled = true;
 
-        let imageUrl = null;
+        try {
+            let imageUrl = null;
 
-        // Upload image if selected
-        if (reportIssueScreen.selectedImage) {
-            const uploadResult = await storageService.uploadImage(reportIssueScreen.selectedImage);
-            if (uploadResult.success) {
-                imageUrl = uploadResult.url;
+            // Upload image if selected
+            if (reportIssueScreen.selectedImage) {
+                console.log('📸 Starting image upload...');
+                const uploadResult = await storageService.uploadImage(reportIssueScreen.selectedImage);
+                console.log('📸 Upload result:', uploadResult);
+                
+                if (uploadResult.success) {
+                    imageUrl = uploadResult.url;
+                    // Notify user which method was used
+                    if (uploadResult.method === 'firestore') {
+                        helpers.showSuccess('✅ Image saved (using database storage)');
+                    } else {
+                        helpers.showSuccess('✅ Image uploaded');
+                    }
+                } else {
+                    console.error('❌ Image upload failed:', uploadResult.error);
+                    // Continue without image but notify user
+                    helpers.showError('⚠️ Could not save image: ' + uploadResult.error + ' — Report will be submitted without image');
+                }
             }
-        }
 
-        // Create issue
-        const issueData = {
-            title,
-            description,
-            priority,
-            location,
-            imageUrl,
-            icon: 'wrench',
-            notes: []
-        };
+            // Create issue
+            const issueData = {
+                title,
+                description,
+                priority,
+                location,
+                imageUrl,
+                icon: 'wrench',
+                notes: []
+            };
 
-        const result = await firestoreService.createIssue(issueData);
+            console.log('📋 Creating issue report...');
+            const result = await firestoreService.createIssue(issueData);
 
-        if (result.success) {
-            helpers.showSuccess('Report submitted successfully!');
-            reportIssueScreen.selectedImage = null;
-            app.navigate('dashboard');
-        } else {
-            helpers.showError(result.error || 'Failed to submit report');
+            if (result.success) {
+                helpers.showSuccess('✅ Report submitted successfully!');
+                reportIssueScreen.selectedImage = null;
+                app.navigate('dashboard');
+            } else {
+                helpers.showError('❌ ' + (result.error || 'Failed to submit report'));
+                submitBtn.textContent = 'Submit Report';
+                submitBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error('❌ Error submitting report:', error);
+            helpers.showError('❌ An error occurred: ' + error.message);
             submitBtn.textContent = 'Submit Report';
             submitBtn.disabled = false;
         }
