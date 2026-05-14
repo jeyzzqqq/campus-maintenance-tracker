@@ -19,6 +19,7 @@ const app = {
     currentRole: null,
     screenParams: null,
     isLoginInProgress: false, // Flag to prevent auto-navigation during login
+    isAuthResolved: false,
     themeStorageKey: 'maintenancetracker-theme',
 
     getTheme: () => {
@@ -30,9 +31,11 @@ const app = {
         return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     },
 
-    applyTheme: (theme) => {
+    applyTheme: (theme, persist = true) => {
         const resolvedTheme = theme === 'dark' ? 'dark' : 'light';
-        localStorage.setItem(app.themeStorageKey, resolvedTheme);
+        if (persist) {
+            localStorage.setItem(app.themeStorageKey, resolvedTheme);
+        }
         document.documentElement.classList.toggle('dark-mode', resolvedTheme === 'dark');
         document.documentElement.setAttribute('data-theme', resolvedTheme);
         return resolvedTheme;
@@ -50,13 +53,46 @@ const app = {
     },
 
     init: () => {
-        app.applyTheme(app.getTheme());
+        app.applyTheme(app.getTheme(), false);
+
+        const container = document.getElementById('screen-container');
+        if (container) {
+            container.innerHTML = `
+                <div class="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+                    <div class="text-center">
+                        <div class="spinner mx-auto mb-4"></div>
+                        <p class="text-sm text-gray-500">Loading your session...</p>
+                    </div>
+                </div>
+            `;
+        }
+        appNavigation.hide();
 
         // Check if user is already logged in
         authService.onAuthStateChanged(async (user) => {
             // Skip auto-navigation if a login is in progress
             if (app.isLoginInProgress) {
                 console.log('Login in progress, skipping auto-navigation');
+                return;
+            }
+
+            // First auth resolution on refresh/app load.
+            // Navigate once after Firebase confirms whether a user session exists.
+            if (!app.isAuthResolved) {
+                app.isAuthResolved = true;
+
+                if (user) {
+                    app.currentUser = user;
+                    const userData = await authService.getUserData(user.uid);
+                    app.currentRole = userData?.role || 'user';
+                    const screen = app.currentRole === 'admin' ? 'admin-dashboard' : 'dashboard';
+                    app.navigate(screen);
+                } else {
+                    app.currentUser = null;
+                    app.currentRole = null;
+                    app.navigate('login');
+                }
+
                 return;
             }
 
@@ -69,13 +105,15 @@ const app = {
                     const screen = app.currentRole === 'admin' ? 'admin-dashboard' : 'dashboard';
                     app.navigate(screen);
                 }
-            } else if (!user && app.currentScreen !== 'login') {
-                app.navigate('login');
+            } else if (!user) {
+                app.currentUser = null;
+                app.currentRole = null;
+
+                if (app.currentScreen !== 'login') {
+                    app.navigate('login');
+                }
             }
         });
-
-        // Initial render
-        app.navigate('login');
     },
 
     navigate: async (screen, params = null) => {
@@ -104,6 +142,12 @@ const app = {
             screen = 'dashboard';
             app.currentScreen = screen;
             app.screenParams = null;
+        }
+
+        if (screen === 'login') {
+            app.applyTheme('light', false);
+        } else {
+            app.applyTheme(app.getTheme(), false);
         }
 
         const container = document.getElementById('screen-container');

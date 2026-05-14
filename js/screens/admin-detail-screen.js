@@ -100,6 +100,9 @@ export const adminDetailScreen = {
                             ${issue.assignedTo ? `
                                 <p class="text-sm text-gray-500">Assigned to: ${issue.assignedTo}</p>
                             ` : ''}
+                            ${issue.fixedBy ? `
+                                <p class="text-sm text-gray-500">Fixed by: ${issue.fixedBy}</p>
+                            ` : ''}
                         </div>
                     </div>
 
@@ -179,19 +182,38 @@ export const adminDetailScreen = {
                         </div>
                     </div>
 
-                    <!-- Assign to Staff -->
+                    <!-- Staff Assignment & Fix Details -->
                     <div class="bg-white rounded-2xl shadow-sm p-4">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Assign to Staff</h3>
-                        <select 
-                            id="assign-select"
-                            onchange="adminDetailScreen.assignStaff()"
-                            class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                        >
-                            <option value="">Select staff member...</option>
-                            <option value="Mike Johnson">Mike Johnson</option>
-                            <option value="Tom Wilson">Tom Wilson</option>
-                            <option value="Sarah Martinez">Sarah Martinez</option>
-                        </select>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Staff Details</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label for="handled-by-input" class="block text-sm font-medium text-gray-700 mb-1">Staff member who handled this</label>
+                                <input
+                                    id="handled-by-input"
+                                    type="text"
+                                    value="${issue.assignedTo || ''}"
+                                    placeholder="Enter staff member name"
+                                    class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label for="fixed-by-input" class="block text-sm font-medium text-gray-700 mb-1">Name of person who fixed the issue</label>
+                                <input
+                                    id="fixed-by-input"
+                                    type="text"
+                                    value="${issue.fixedBy || ''}"
+                                    placeholder="Enter name of staff who fixed it"
+                                    class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                onclick="adminDetailScreen.saveStaffDetails()"
+                                class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                            >
+                                Save Staff Details
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -250,23 +272,30 @@ export const adminDetailScreen = {
         }
     },
 
-    assignStaff: async () => {
+    saveStaffDetails: async () => {
         if (!adminDetailScreen.currentIssue) return;
 
-        const select = document.getElementById('assign-select');
-        const staffName = select.value;
+        const handledByInput = document.getElementById('handled-by-input');
+        const fixedByInput = document.getElementById('fixed-by-input');
 
-        if (!staffName) return;
+        const handledBy = handledByInput ? handledByInput.value.trim() : '';
+        const fixedBy = fixedByInput ? fixedByInput.value.trim() : '';
+
+        if (!handledBy && !fixedBy) {
+            helpers.showError('Please enter at least one name');
+            return;
+        }
 
         const result = await firestoreService.updateIssue(adminDetailScreen.currentIssue.id, { 
-            assignedTo: staffName 
+            assignedTo: handledBy,
+            fixedBy
         });
         
         if (result.success) {
-            helpers.showSuccess(`Assigned to ${staffName}`);
+            helpers.showSuccess('Staff details updated');
             app.navigate('admin-detail', adminDetailScreen.currentIssue.id);
         } else {
-            helpers.showError('Failed to assign staff');
+            helpers.showError('Failed to update staff details');
         }
     }
 };
