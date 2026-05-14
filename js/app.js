@@ -77,7 +77,7 @@ const app = {
             }
 
             // First auth resolution on refresh/app load.
-            // Navigate once after Firebase confirms whether a user session exists.
+            // Always show login screen - no auto-navigation
             if (!app.isAuthResolved) {
                 app.isAuthResolved = true;
 
@@ -85,8 +85,8 @@ const app = {
                     app.currentUser = user;
                     const userData = await authService.getUserData(user.uid);
                     app.currentRole = userData?.role || 'user';
-                    const screen = app.currentRole === 'admin' ? 'admin-dashboard' : 'dashboard';
-                    app.navigate(screen);
+                    // Don't auto-navigate - always show login
+                    app.navigate('login');
                 } else {
                     app.currentUser = null;
                     app.currentRole = null;
@@ -101,10 +101,8 @@ const app = {
                 const userData = await authService.getUserData(user.uid);
                 app.currentRole = userData?.role || 'user';
                 
-                if (app.currentScreen === 'login') {
-                    const screen = app.currentRole === 'admin' ? 'admin-dashboard' : 'dashboard';
-                    app.navigate(screen);
-                }
+                // Don't auto-navigate - stay on current screen
+                // User must manually click Sign In
             } else if (!user) {
                 app.currentUser = null;
                 app.currentRole = null;

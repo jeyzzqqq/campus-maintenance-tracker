@@ -1,6 +1,7 @@
 import { helpers } from "../utils/helpers.js";
 import { authService } from "../services/auth-service.js";
 import { auth } from "../config/firebase-config.js";
+import { updatePassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // Login Screen
 
@@ -164,22 +165,21 @@ export const loginScreen = {
                         </button>
 
                         <button 
+                            type="button" 
+                            class="w-full text-green-600 py-2 font-medium text-sm text-center" 
+                            onclick="loginScreen.handleForgotPassword()"
+                        >
+                            Forgot Password?
+                        </button>
+
+                        <button 
                             id="toggle-create-account"
                             type="button"
                             onclick="loginScreen.setMode(loginScreen.mode === 'signup' ? 'login' : 'signup')"
-                            class="w-full text-green-600 py-2 font-medium text-sm"
+                            class="w-full text-green-600 py-2 font-medium text-sm text-center"
                         >
                             Create Account
                         </button>
-
-                        <div class="flex items-center justify-between gap-3">
-                            <button type="button" class="text-green-600 py-2 font-medium text-sm" onclick="loginScreen.handleForgotPassword()">
-                                Forgot Password?
-                            </button>
-                            <button type="button" class="text-gray-500 py-2 font-medium text-sm" onclick="loginScreen.togglePasswordVisibility()">
-                                Show Password
-                            </button>
-                        </div>
                     </form>
                 </div>
             </div>
@@ -300,10 +300,98 @@ export const loginScreen = {
     },
 
     handleForgotPassword: async () => {
-        const email = document.getElementById('email-input').value.trim();
+        const html = `
+            <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;" id="reset-password-modal">
+                <div style="background: white; padding: 24px; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+                    <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #111827;">Reset Password</h2>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; color: #374151; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Email Address</label>
+                        <input 
+                            id="reset-email-input" 
+                            type="email" 
+                            placeholder="student@campus.edu"
+                            style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;"
+                        />
+                    </div>
 
-        if (!email) {
-            helpers.showError('Enter your email first');
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; color: #374151; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Current Password</label>
+                        <input 
+                            id="reset-current-password-input" 
+                            type="password" 
+                            placeholder="••••••••"
+                            style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;"
+                        />
+                    </div>
+
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; color: #374151; margin-bottom: 8px; font-weight: 500; font-size: 14px;">New Password</label>
+                        <input 
+                            id="reset-password-input" 
+                            type="password" 
+                            placeholder="••••••••"
+                            style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;"
+                        />
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; color: #374151; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Confirm New Password</label>
+                        <input 
+                            id="reset-confirm-password-input" 
+                            type="password" 
+                            placeholder="••••••••"
+                            style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;"
+                        />
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <button 
+                            onclick="loginScreen.closeResetModal()"
+                            style="padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #6b7280; font-weight: 500; cursor: pointer; font-size: 14px;"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            onclick="loginScreen.submitPasswordReset()"
+                            style="padding: 10px; border: none; border-radius: 8px; background: #16a34a; color: white; font-weight: 500; cursor: pointer; font-size: 14px;"
+                        >
+                            Reset Password
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const container = document.getElementById('screen-container');
+        const modalDiv = document.createElement('div');
+        modalDiv.innerHTML = html;
+        container.appendChild(modalDiv);
+
+        // Pre-fill email if available
+        const emailInput = document.getElementById('reset-email-input');
+        const currentEmail = document.getElementById('email-input').value.trim();
+        if (currentEmail) {
+            emailInput.value = currentEmail;
+            document.getElementById('reset-current-password-input').focus();
+        } else {
+            emailInput.focus();
+        }
+    },
+
+    closeResetModal: () => {
+        const modal = document.getElementById('reset-password-modal');
+        if (modal) modal.parentElement.removeChild(modal);
+    },
+
+    submitPasswordReset: async () => {
+        const email = document.getElementById('reset-email-input').value.trim();
+        const currentPassword = document.getElementById('reset-current-password-input').value;
+        const newPassword = document.getElementById('reset-password-input').value;
+        const confirmPassword = document.getElementById('reset-confirm-password-input').value;
+
+        if (!email || !currentPassword || !newPassword || !confirmPassword) {
+            helpers.showError('Please fill in all fields');
             return;
         }
 
@@ -312,11 +400,47 @@ export const loginScreen = {
             return;
         }
 
+        if (newPassword.length < 6) {
+            helpers.showError('Password must be at least 6 characters');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            helpers.showError('New passwords do not match');
+            return;
+        }
+
+        if (currentPassword === newPassword) {
+            helpers.showError('New password must be different from current password');
+            return;
+        }
+
         try {
-            await auth.sendPasswordResetEmail(email);
-            helpers.showSuccess('Password reset email sent');
+            // Verify current credentials first
+            const signInResult = await authService.signIn(email, currentPassword, loginScreen.selectedRole);
+            
+            if (!signInResult.success) {
+                helpers.showError('Current email or password is incorrect');
+                return;
+            }
+
+            // Update password in Firebase Auth
+            const user = auth.currentUser;
+            if (!user) {
+                helpers.showError('Unable to update password. Please try again.');
+                return;
+            }
+
+            await updatePassword(user, newPassword);
+            
+            // Sign out after password change
+            await authService.signOut();
+            
+            helpers.showSuccess('✅ Password updated successfully! Please sign in with your new password.');
+            loginScreen.closeResetModal();
         } catch (error) {
-            helpers.showError(error.message || 'Unable to send password reset email');
+            console.error('Password reset error:', error);
+            helpers.showError(error.message || 'Failed to reset password');
         }
     },
 
@@ -453,7 +577,7 @@ export const loginScreen = {
 
         if (result.success) {
             const userData = await authService.getUserData(result.user.uid);
-            const role = userData?.role || result.role || 'user';
+            const role = result.role || userData?.role || 'user';
 
             const passwordField = document.getElementById('password-input');
             if (passwordField) passwordField.value = '';
