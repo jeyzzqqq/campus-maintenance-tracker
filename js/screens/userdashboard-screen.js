@@ -5,6 +5,19 @@ import { firestoreService } from "../services/firestore-service.js";
 // User Dashboard Screen
 
 export const userDashboardScreen = {
+    deleteIssue: async (issueId) => {
+        const confirmed = window.confirm('Delete this report? This cannot be undone.');
+        if (!confirmed) return;
+
+        const result = await firestoreService.deleteIssue(issueId);
+        if (result.success) {
+            helpers.showSuccess('Report deleted');
+            app.navigate('dashboard');
+        } else {
+            helpers.showError(result.error || 'Failed to delete report');
+        }
+    },
+
     render: async () => {
         helpers.showLoading();
 
@@ -48,6 +61,22 @@ export const userDashboardScreen = {
                                     <div class="flex items-center justify-between">
                                         ${helpers.getStatusBadge(issue.status)}
                                         <span class="text-xs text-gray-400">${helpers.formatDate(issue.createdAt)}</span>
+                                    </div>
+                                    <div class="mt-3 flex gap-2">
+                                        <button
+                                            type="button"
+                                            onclick="event.stopPropagation(); app.navigate('report', '${issue.id}')"
+                                            class="flex-1 rounded-lg bg-gray-100 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onclick="event.stopPropagation(); userDashboardScreen.deleteIssue('${issue.id}')"
+                                            class="flex-1 rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-100 transition-colors"
+                                        >
+                                            Delete
+                                        </button>
                                     </div>
                                 </div>
                             </div>

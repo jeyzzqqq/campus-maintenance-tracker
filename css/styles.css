@@ -8,6 +8,76 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+html.dark-mode,
+html.dark-mode body {
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+html.dark-mode body {
+    color-scheme: dark;
+}
+
+html.dark-mode .bg-gray-50 {
+    background-color: #0f172a !important;
+}
+
+html.dark-mode .bg-white {
+    background-color: #111827 !important;
+}
+
+html.dark-mode .bg-gray-100 {
+    background-color: #1f2937 !important;
+}
+
+html.dark-mode .bg-gray-200 {
+    background-color: #374151 !important;
+}
+
+html.dark-mode .bg-gray-300 {
+    background-color: #4b5563 !important;
+}
+
+html.dark-mode .text-gray-900,
+html.dark-mode .text-gray-800,
+html.dark-mode .text-gray-700,
+html.dark-mode .text-gray-600 {
+    color: #f3f4f6 !important;
+}
+
+html.dark-mode .text-gray-500,
+html.dark-mode .text-gray-400 {
+    color: #9ca3af !important;
+}
+
+html.dark-mode .border-gray-100,
+html.dark-mode .border-gray-200,
+html.dark-mode .border-gray-300 {
+    border-color: #374151 !important;
+}
+
+html.dark-mode .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+    border-color: #374151 !important;
+}
+
+html.dark-mode .shadow-sm,
+html.dark-mode .shadow-md,
+html.dark-mode .shadow-lg {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24) !important;
+}
+
+html.dark-mode .hover\:bg-gray-50:hover {
+    background-color: #1f2937 !important;
+}
+
+html.dark-mode #screen-container::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+
+html.dark-mode #screen-container::-webkit-scrollbar-thumb {
+    background: #4b5563;
+}
+
 .font-inter {
     font-family: 'Inter', sans-serif;
 }

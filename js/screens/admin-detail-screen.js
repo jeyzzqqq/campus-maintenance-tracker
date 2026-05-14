@@ -1,11 +1,27 @@
 import { helpers } from "../utils/helpers.js";
 import { firestoreService } from "../services/firestore-service.js";
+import { adminReportsScreen } from "./admin-reports-screen.js";
 
 // Admin Detail Screen
 
 export const adminDetailScreen = {
     currentIssue: null,
     isImageZoomOpen: false,
+
+    deleteIssue: async () => {
+        if (!adminDetailScreen.currentIssue) return;
+
+        const confirmed = window.confirm('Delete this report? This cannot be undone.');
+        if (!confirmed) return;
+
+        const result = await firestoreService.deleteIssue(adminDetailScreen.currentIssue.id);
+        if (result.success) {
+            helpers.showSuccess('Report deleted');
+            app.navigate('admin-reports', adminReportsScreen.currentFilter || 'all');
+        } else {
+            helpers.showError(result.error || 'Failed to delete report');
+        }
+    },
 
     render: async (issueId) => {
         helpers.showLoading();
@@ -71,6 +87,13 @@ export const adminDetailScreen = {
                             ${helpers.getPriorityBadge(issue.priority)}
                         </div>
                         <p class="text-gray-700 mb-3">${issue.description}</p>
+                        <button
+                            type="button"
+                            onclick="adminDetailScreen.deleteIssue()"
+                            class="w-full rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors mb-3"
+                        >
+                            Delete Report
+                        </button>
                         <div class="border-t border-gray-100 pt-3">
                             <p class="text-sm text-gray-500">Reported by: ${issue.userEmail}</p>
                             <p class="text-sm text-gray-500">Date: ${helpers.formatDate(issue.createdAt)}</p>

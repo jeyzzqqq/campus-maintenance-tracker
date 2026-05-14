@@ -6,6 +6,19 @@ import { firestoreService } from "../services/firestore-service.js";
 export const adminReportsScreen = {
     currentFilter: 'all',
 
+    deleteIssue: async (issueId, filter = 'all') => {
+        const confirmed = window.confirm('Delete this report? This cannot be undone.');
+        if (!confirmed) return;
+
+        const result = await firestoreService.deleteIssue(issueId);
+        if (result.success) {
+            helpers.showSuccess('Report deleted');
+            app.navigate('admin-reports', filter || adminReportsScreen.currentFilter || 'all');
+        } else {
+            helpers.showError(result.error || 'Failed to delete report');
+        }
+    },
+
     render: async (filter = 'all') => {
         helpers.showLoading();
         adminReportsScreen.currentFilter = filter;
@@ -73,6 +86,15 @@ export const adminReportsScreen = {
                                         ${helpers.getPriorityBadge(issue.priority)}
                                     </div>
                                     <p class="text-xs text-gray-400">Reported by: ${issue.userEmail}</p>
+                                    <div class="mt-3">
+                                        <button
+                                            type="button"
+                                            onclick="event.stopPropagation(); adminReportsScreen.deleteIssue('${issue.id}', '${filter}')"
+                                            class="rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-100 transition-colors"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
                                 </div>
                                 <span class="text-gray-400 flex-shrink-0 self-center">${helpers.icons.arrowRight}</span>
                             </div>

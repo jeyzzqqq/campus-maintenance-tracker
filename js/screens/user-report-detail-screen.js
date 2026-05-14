@@ -6,6 +6,19 @@ import { firestoreService } from "../services/firestore-service.js";
 export const userReportDetailScreen = {
     isImageZoomOpen: false,
 
+    deleteIssue: async (issueId) => {
+        const confirmed = window.confirm('Delete this report? This cannot be undone.');
+        if (!confirmed) return;
+
+        const result = await firestoreService.deleteIssue(issueId);
+        if (result.success) {
+            helpers.showSuccess('Report deleted');
+            app.navigate('dashboard');
+        } else {
+            helpers.showError(result.error || 'Failed to delete report');
+        }
+    },
+
     render: async (issueId) => {
         helpers.showLoading();
 
@@ -69,6 +82,22 @@ export const userReportDetailScreen = {
                             ${helpers.getPriorityBadge(issue.priority)}
                         </div>
                         <p class="text-gray-700 mb-3">${issue.description}</p>
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <button
+                                type="button"
+                                onclick="app.navigate('report', '${issue.id}')"
+                                class="rounded-xl bg-gray-100 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+                            >
+                                Edit Report
+                            </button>
+                            <button
+                                type="button"
+                                onclick="userReportDetailScreen.deleteIssue('${issue.id}')"
+                                class="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-100 transition-colors"
+                            >
+                                Delete Report
+                            </button>
+                        </div>
                         <div class="border-t border-gray-100 pt-3">
                             <p class="text-sm text-gray-500">Date: ${helpers.formatDate(issue.createdAt)}</p>
                             ${issue.status === 'resolved' ? `

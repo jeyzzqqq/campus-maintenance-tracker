@@ -19,8 +19,39 @@ const app = {
     currentRole: null,
     screenParams: null,
     isLoginInProgress: false, // Flag to prevent auto-navigation during login
+    themeStorageKey: 'maintenancetracker-theme',
+
+    getTheme: () => {
+        const storedTheme = localStorage.getItem(app.themeStorageKey);
+        if (storedTheme === 'dark' || storedTheme === 'light') {
+            return storedTheme;
+        }
+
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    },
+
+    applyTheme: (theme) => {
+        const resolvedTheme = theme === 'dark' ? 'dark' : 'light';
+        localStorage.setItem(app.themeStorageKey, resolvedTheme);
+        document.documentElement.classList.toggle('dark-mode', resolvedTheme === 'dark');
+        document.documentElement.setAttribute('data-theme', resolvedTheme);
+        return resolvedTheme;
+    },
+
+    toggleTheme: () => {
+        const nextTheme = app.getTheme() === 'dark' ? 'light' : 'dark';
+        const appliedTheme = app.applyTheme(nextTheme);
+
+        if (app.currentScreen) {
+            app.navigate(app.currentScreen, app.screenParams);
+        }
+
+        return appliedTheme;
+    },
 
     init: () => {
+        app.applyTheme(app.getTheme());
+
         // Check if user is already logged in
         authService.onAuthStateChanged(async (user) => {
             // Skip auto-navigation if a login is in progress
@@ -96,7 +127,7 @@ const app = {
                 html = await userDashboardScreen.render();
                 break;
             case 'report':
-                html = reportIssueScreen.render();
+                html = await reportIssueScreen.render(params);
                 break;
             case 'profile':
                 html = await profileScreen.render();

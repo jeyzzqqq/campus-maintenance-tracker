@@ -14,6 +14,7 @@ import {
 	addDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { auth, db } from "../config/firebase-config.js";
+import { storageService } from "../services/storage-service.js";
 
 // Firestore Database Service
 
@@ -135,11 +136,42 @@ export const firestoreService = {
     // Delete issue
     deleteIssue: async (issueId) => {
         try {
+            const issueResult = await firestoreService.getIssue(issueId);
+            if (issueResult.success && issueResult.issue) {
+                const issue = issueResult.issue;
+
+                if (issue.imageStorageDocId) {
+                    await deleteDoc(doc(db, 'issueImages', issue.imageStorageDocId));
+                }
+
+                if (issue.imageUrl) {
+                    await storageService.deleteImage(issue.imageUrl);
+                }
+            }
+
             await deleteDoc(doc(db, 'issues', issueId));
             return { success: true };
         } catch (error) {
             console.error('Error deleting issue:', error);
             return firestoreService.handleUnavailable(error, 'Unable to delete the report until Firestore is enabled in Firebase Console.');
+        }
+    },
+
+    // Cleanup an image record when a report is updated or deleted
+    deleteIssueImageCleanup: async (imageUrl, imageStorageDocId) => {
+        try {
+            if (imageStorageDocId) {
+                await deleteDoc(doc(db, 'issueImages', imageStorageDocId));
+            }
+
+            if (imageUrl) {
+                await storageService.deleteImage(imageUrl);
+            }
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error cleaning up issue image:', error);
+            return firestoreService.handleUnavailable(error, 'Unable to remove the old image right now.');
         }
     },
 
